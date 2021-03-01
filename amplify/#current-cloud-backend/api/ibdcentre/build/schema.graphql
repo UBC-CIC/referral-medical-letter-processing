@@ -1,0 +1,159 @@
+type Status @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  status: String
+  errorMessage: String
+  expirationTime: Int!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  owner: String
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelStatusConnection @aws_iam @aws_cognito_user_pools {
+  items: [Status]
+  nextToken: String
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+input ModelStatusFilterInput {
+  id: ModelIDInput
+  status: ModelStringInput
+  errorMessage: ModelStringInput
+  expirationTime: ModelIntInput
+  and: [ModelStatusFilterInput]
+  or: [ModelStatusFilterInput]
+  not: ModelStatusFilterInput
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+type Query {
+  getStatus(id: ID!): Status @aws_iam @aws_cognito_user_pools
+  listStatuss(filter: ModelStatusFilterInput, limit: Int, nextToken: String): ModelStatusConnection @aws_iam @aws_cognito_user_pools
+}
+
+input CreateStatusInput {
+  id: ID
+  status: String
+  errorMessage: String
+  expirationTime: Int!
+}
+
+input UpdateStatusInput {
+  id: ID!
+  status: String
+  errorMessage: String
+  expirationTime: Int
+}
+
+input DeleteStatusInput {
+  id: ID
+}
+
+type Mutation {
+  createStatus(input: CreateStatusInput!, condition: ModelStatusConditionInput): Status @aws_iam @aws_cognito_user_pools
+  updateStatus(input: UpdateStatusInput!, condition: ModelStatusConditionInput): Status @aws_iam @aws_cognito_user_pools
+  deleteStatus(input: DeleteStatusInput!, condition: ModelStatusConditionInput): Status @aws_iam @aws_cognito_user_pools
+}
+
+input ModelStatusConditionInput {
+  status: ModelStringInput
+  errorMessage: ModelStringInput
+  expirationTime: ModelIntInput
+  and: [ModelStatusConditionInput]
+  or: [ModelStatusConditionInput]
+  not: ModelStatusConditionInput
+}
+
+type Subscription {
+  onCreateStatus: Status @aws_subscribe(mutations: ["createStatus"]) @aws_iam @aws_cognito_user_pools
+  onUpdateStatus: Status @aws_subscribe(mutations: ["updateStatus"]) @aws_iam @aws_cognito_user_pools
+  onDeleteStatus: Status @aws_subscribe(mutations: ["deleteStatus"]) @aws_iam @aws_cognito_user_pools
+}

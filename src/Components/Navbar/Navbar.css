@@ -1,0 +1,173 @@
+
+.navbar-inner {
+    background-color: #012144;
+    color: lightgray;
+}
+
+.navbar-wrapper {
+    background-color: black;
+    padding: 3px;
+}
+
+.brand-wrapper {
+    background-color: #313a45;
+    border-radius: 4px;
+    border: 2px solid #1d2029;
+    width: 8vw;
+    height: 40px;
+    margin-left: 3vw;
+    margin-top: -2px;
+    padding: 2px;
+    color: whitesmoke;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-column {
+    padding-top: 15px;
+}
+
+.navbar-column-button {
+    padding-top: 10px;
+}
+
+.logout-button {
+    padding: 0px !important;
+}
+
+.logout-text {
+    color: orange;
+    font-size: 1.0rem;
+}
+
+.logout-text-button {
+    background-color: inherit;
+    border: none;
+}
+
+.logout-text-button:hover {
+   cursor: pointer;
+}
+
+.logout-button-icon {
+    color: orange;
+    font-size: 32px !important;
+    padding: 0px !important;
+}
+
+.brand-text {
+    font-size: 1.5rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
+
+.brand-text-divider {
+    color: orange;
+}
+
+.aws-image {
+    width: 40px;
+    height: 40px;
+    margin-left: -95.0%;
+    border-radius: 4px;
+}
+
+@media only screen and (max-width: 1920px) {
+    .aws-image {
+        margin-left: -70.0%;
+    }
+
+    .brand-wrapper {
+        width: 10vw;
+    }
+}
+
+@media only screen and (max-width: 1600px) {
+    .aws-image {
+        margin-left: -20.0%;
+    }
+
+    .brand-text {
+        font-size: 1.3rem;
+    }
+
+    .brand-wrapper {
+        width: 12vw;
+    }
+}
+
+@media only screen and (max-width: 1300px) {
+    .aws-image {
+        margin-left: -10.0%;
+    }
+
+    .brand-text {
+        font-size: 1.2rem;
+    }
+
+    .brand-wrapper {
+        width: 12vw;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .aws-image {
+        width: 40px;
+        height: 40px;
+        margin-left: -25.0%;
+    }
+    .brand-text {
+        font-size: 0.9rem;
+    }
+
+    .brand-wrapper {
+        width: 11vw;
+        height: 30px;
+    }
+}
+
+@media only screen and (max-width: 870px) {
+    .aws-image {
+        margin-left: -20.0%;
+    }
+    .brand-text {
+        font-size: 0.6rem;
+    }
+    .brand-wrapper {
+        width: 10vw;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .aws-image {
+        width: 30px;
+        height: 30px;
+        margin-left: -20%;
+    }
+    .brand-text {
+        font-size: 0.5rem;
+    }
+
+    .brand-wrapper {
+        width: 10vw;
+        height: 30px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .aws-image {
+        width: 30px;
+        height: 30px;
+        margin-left: -20%;
+    }
+    .brand-text {
+        font-size: 0.3rem;
+    }
+
+    .brand-wrapper {
+        width: 10vw;
+        height: 30px;
+    }
+}

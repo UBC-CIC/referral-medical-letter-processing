@@ -1,0 +1,17 @@
+{
+    "CreateAPIKey": 0,
+    "AppSyncApiName": "ibdcentre",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authibdcentre98a4cd1a",
+            "Outputs.UserPoolId"
+        ]
+    },
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "S3DeploymentBucket": "amplify-ibdcentre-dev-221621-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/dc1e43021a0fb2856e5df55302ed0dce5d319d0b"
+}
