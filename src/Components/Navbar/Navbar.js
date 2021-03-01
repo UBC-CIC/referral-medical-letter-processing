@@ -2,16 +2,19 @@ import React, {Component} from 'react';
 import { Grid } from 'semantic-ui-react';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import IconButton from '@material-ui/core/IconButton';
+import { connect } from "react-redux";
 import { Auth } from "aws-amplify";
+import {updateLoginState} from "../../actions/loginActions";
 import "./Navbar.css";
 
 
 
 class Navbar extends Component {
 
-    onSignOut = () => {
-        Auth.signOut();
-        window.location.reload();
+    onSignOut = async () => {
+        const {updateLoginState} = this.props;
+        await Auth.signOut();
+        updateLoginState("signIn");
     }
 
     render() {
@@ -26,7 +29,7 @@ class Navbar extends Component {
                                         <Grid.Row columns={2}>
                                             <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
                                                 <div className={"brand-wrapper"}>
-                                                    <span className={"brand-text"}>Text<span className={"brand-text-divider"}>/</span>Extract</span>
+                                                    <span className={"brand-text"}>IBD<span className={"brand-text-divider"}>/</span>Centre</span>
                                                 </div>
                                             </Grid.Column>
                                             <Grid.Column>
@@ -75,4 +78,14 @@ class Navbar extends Component {
     }
 }
 
-export default Navbar;
+const mapStateToProps = (state) => {
+    return {
+        loginState: state.loginState.currentState,
+    };
+};
+
+const mapDispatchToProps = {
+    updateLoginState,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
