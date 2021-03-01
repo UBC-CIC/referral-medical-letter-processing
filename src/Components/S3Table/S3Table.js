@@ -100,11 +100,11 @@ class S3Table extends Component {
             refreshBtnDisabled: true,
         })
         const that = this;
-        Storage.list('csv/', { level: 'protected' })
+        Storage.list('json/', { level: 'protected' })
             .then(result => {
                 for (var i in result) {
-                    const name = result[i].key.replace("csv/","");
-                    let keyWithoutExt = name.replace(".csv", "");
+                    const name = result[i].key.replace("json/","");
+                    let keyWithoutExt = name.replace(".json", "");
                     let keyExtIndex = keyWithoutExt.lastIndexOf("-");
                     let key = keyWithoutExt.concat(".").concat(keyWithoutExt.substring(keyExtIndex + 1));
                     let strippedName = name.substring(37,);
@@ -159,7 +159,7 @@ class S3Table extends Component {
             return a;
         }
 
-        return Storage.get("csv/"+key, { download: true, level: "protected" })
+        return Storage.get("json/"+key, { download: true, level: "protected" })
             .then(res => downloadBlob(res.Body, key)) // derive downloadFileName from fileKey if you wish
             .catch(err => {
                 console.log(err);
@@ -168,7 +168,7 @@ class S3Table extends Component {
     }
 
     async removeData(key) {
-        Storage.remove("csv/"+key, { level: 'protected' })
+        Storage.remove("json/"+key, { level: 'protected' })
             .then()
             .catch(err => console.log(err));
         var arr = [...this.state.files];
@@ -191,7 +191,7 @@ class S3Table extends Component {
                                     <Grid.Row style={{paddingTop: "0px"}}>
                                         <Grid.Column textAlign={"left"} verticalAlign={"middle"}>
                                             <div className={"files-wrapper-top"}>
-                                                <span className={"processed-files-header"}>Processed Files (CSV)</span>
+                                                <span className={"processed-files-header"}>Processed Files (JSON)</span>
                                             </div>
                                         </Grid.Column>
                                     </Grid.Row>
