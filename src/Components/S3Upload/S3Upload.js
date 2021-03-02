@@ -52,6 +52,7 @@ class S3Upload extends Component {
             displaySpecificPages: false,
             pageOption: "all",
             pageFilter: "none",
+            patientID: "",
             status: "Ready",
             errorMessage: null,
         }
@@ -270,7 +271,7 @@ class S3Upload extends Component {
 
     render() {
         const {displayFileOptions, invalidFileType, fileName, isProcessing, loadingProgress,
-            confidence, displaySpecificPages, pageOption, pageFilter, status} = this.state;
+            confidence, displaySpecificPages, pageOption, pageFilter, patientID, status} = this.state;
         return (
             <Grid style={{marginLeft: "1.66%"}}>
                 <Grid.Row>
@@ -443,6 +444,24 @@ class S3Upload extends Component {
                                                                                                 value={confidence} label="Confidence (0-100)"
                                                                                                 onChange={this.handleChange}
                                                                                          required={true}
+                                                                                         />
+                                                                                     </div>
+                                                                                 </Grid.Column>
+                                                                             </Grid.Row>
+                                                                             <Grid.Row style={{paddingBottom: "0px"}}>
+                                                                                 <Grid.Column textAlign={"left"} verticalAlign={"middle"}>
+                                                                                    <span>
+                                                                                        <label className={"label"} htmlFor="patientID"><strong>*Patient ID:</strong></label>
+                                                                                    </span>
+                                                                                 </Grid.Column>
+                                                                             </Grid.Row>
+                                                                             <Grid.Row style={{padding: "0px"}}>
+                                                                                 <Grid.Column textAlign={"left"} verticalAlign={"middle"}>
+                                                                                     <div className={"ui input input-value-box"}>
+                                                                                         <input type="text" id="patientID"
+                                                                                                value={patientID}
+                                                                                                onChange={this.handleChange}
+                                                                                                required={true}
                                                                                          />
                                                                                      </div>
                                                                                  </Grid.Column>
