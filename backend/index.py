@@ -1,10 +1,9 @@
 import boto3 
-import botocore 
-from PyPDF4 import PdfFileReader, PdfFileWriter
-import pdf2image 
+import botocore  
 import time 
 import json
 import urllib.parse
+from PdfProcessor import PdfProcessor
 import logging 
 import base64 
 import os 
@@ -13,9 +12,12 @@ import re
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+textract_processor = PdfProcessor()
 
 DYNAMOTABLE= os.getenv('DYNAMO_TABLE_NAME')
 
+comprehend_medical = boto3.client('comprehendmedical')
+comprehend = boto3.client('comprehend')
 def findEntities(data):
     if not data:
         return []
@@ -38,53 +40,12 @@ def findPii(data):
     result = comprehend.detect_pii_entities(Text=data, LanguageCode='en')
     return result['Entities']
 
-def get_pages(pdf_path, pages, output_path):
-    logger.info(f'Getting Pages {pages}')
-    logger.info(f'{pdf_path} to {output_path}')
-    pdf_reader = PdfFileReader(pdf_path)
-    pdf_writer = PdfFileWriter()
-    if not pages or pages[0] == '': 
-        # if user has not specified page numbers, extract from all pages
-        for page in range(pdf_reader.getNumPages()):
-            write_page(pdf_reader, pdf_writer, page)
-    else: 
-        # otherwise process the page numbers 
-        for page in pages: 
-            if (page.find("-") != -1):
-                # format of page_start - page_end
-                pgs = page.split('-')
-                logger.info(pgs)
-                for pg in range(int(pgs[0]),int(pgs[1])+1):
-                    write_page(pdf_reader, pdf_writer, int(pg)-1)
-            else: 
-                write_page(pdf_reader, pdf_writer, int(page)-1)
-    with open(output_path, 'wb') as out: 
-        pdf_writer.write(out)
-
-def write_page(reader, writer, page):
-    pg = reader.getPage(page)
-    writer.addPage(pg)
-    logger.info(f'Appending Page#{page}')
-
-def convert_to_imgs(pdf_path):
-    logger.info("Converting PDF to Images")
-    with open(pdf_path, 'rb') as f: 
-        content = f.read()
-    logger.info(content[:1500])
-    folder_path = '/tmp/'
-    file_names = pdf2image.convert_from_bytes(content, dpi=500, poppler_path='poppler_binaries/', output_folder=folder_path, fmt='JPEG', paths_only=True)
-    logger.info(f'PDFs are {glob.glob(folder_path+"*.pdf")}')
-    logger.info(f'Images are {file_names}')
-    return file_names 
 
 # Added code for summary response
-def textract_img(path_arr):
-    textract = boto3.client('textract')
+def process_file(bucket, file_path):
 
     # Comprehend Medical and Comprehend functions and setup
-    comprehend_medical = boto3.client('comprehendmedical')
-    comprehend = boto3.client('comprehend')
-    myDict = {}
+    mySum = {}
     # Endoscopic Procedures (possibly store this in Django or a DB) and call as a set 
     endoscopy = {'anoscopy',
                 'arthroscopy',
@@ -109,22 +70,25 @@ def textract_img(path_arr):
     problem_history = []
     page_sum = set()
     medication_instances = {}
+    jobIds = []
+    textract = boto3.client('textract')
+    jobIds.append(textract_processor.startJob(bucket, file_path))
 
-    result = []
-    for path in path_arr: 
-        img_file = open(path, "rb")
-        logger.info(f'Reading File in Path {path}')
-        data = img_file.read()
-        response = textract.analyze_document(
-            Document={
-                'Bytes': data
-            },
-            FeatureTypes=["TABLES"]
-        )
-        result.append(response)
-    logger.info("Finished Textract")
-    text = data
-    for text in result:
+    finished = False 
+    while finished == False:
+        state = True
+        for jobId in jobIds:
+            state = state and (textract_processor.checkJobCompletion(jobId) != "IN_PROGRESS")
+        time.sleep(5)
+        finished = state 
+
+    #print('Textract time is {}\n'.format(time.time()-start))
+    jobResults = []
+    for jobId in jobIds:
+        text = textExtractHelper(textract_processor.getJobResults(jobId))
+        jobResults.append(text)
+
+    for text in jobResults:
         logger.info(f'{text[1:30]}')
         page_text = ""
         page_text = text
@@ -178,19 +142,19 @@ def textract_img(path_arr):
             page_sum = re.findall(pattern2, page_text)
             pat_sum = page_sum
             for pat in pat_sum:
-                myDict["Problem History"] = pat[0]
-                myDict["Lifestyle Notes"] = pat[4]
-                myDict["Family History"] = pat[5]
-                myDict["Extra Intestinal Manifestations"] = pat[3]
-                myDict["Past Surgical History"] = pat[2]
+                mySum["Problem History"] = pat[0]
+                mySum["Lifestyle Notes"] = pat[4]
+                mySum["Family History"] = pat[5]
+                mySum["Extra Intestinal Manifestations"] = pat[3]
+                mySum["Past Surgical History"] = pat[2]
         except Exception as e:
             print(e)
 
-        myDict["Medical condition"] = medical_condition
-        myDict["Current Medication"] = current_medication
-        myDict["Endoscopic Procedures"] = endoscopic_procedures
+        mySum["Medical condition"] = medical_condition
+        mySum["Current Medication"] = current_medication
+        mySum["Endoscopic Procedures"] = endoscopic_procedures
 
-    return json.dumps(myDict) 
+    return json.dumps(mySum) 
 
 def insert_into_s3(obj, bucket, objname): 
     s3_client = boto3.client('s3')
@@ -254,15 +218,8 @@ def handler(event, context):
     try: 
         # Get and download the s3 object 
         get_s3_object(bucket, "protected/"+amplify_user+"/"+key, file_path)
-        # Check if file is PDF or Image type (JPEG, JPG, or PNG)
-        if(json_content["file_type"] == 'pdf'):
-            # Get the pages specified into a new file object 
-            get_pages(file_path, json_content["pages"], output_path)
-            # Convert the PDF to images 
-            img_arr = convert_to_imgs(output_path)
-        elif(json_content["file_type"] == 'jpeg' or json_content["file_type"] == 'jpg' or json_content["file_type"] == 'png'):
-            img_arr = [file_path]
-        summary = textract_img(img_arr)
+
+        summary = process_file(bucket, file_path)
         #text_response = textExtractHelper(response)
         #summary = get_summary(response)
         #table_csv = get_table_csv_results(response, int(json_content["confidence"]))
