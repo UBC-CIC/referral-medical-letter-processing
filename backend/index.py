@@ -213,8 +213,8 @@ def handler(event, context):
     logger.info(f'Key for file is {key}')
     output_path = '/tmp/s3_' + key
     file_path = '/tmp/' + key
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(DYNAMOTABLE)
+    #dynamodb = boto3.resource('dynamodb')
+    #table = dynamodb.Table(DYNAMOTABLE)
     try: 
         # Get and download the s3 object 
         get_s3_object(bucket, "protected/"+amplify_user+"/"+key, file_path)
@@ -225,38 +225,38 @@ def handler(event, context):
         #table_csv = get_table_csv_results(response, int(json_content["confidence"]))
         logger.info(summary)
         output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
-        insert_into_s3(summary, bucket, output_key)
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status',
-            ExpressionAttributeNames={'#status': 'status'},
-            ExpressionAttributeValues={':status': 'Success'}
-        )
+        insert_into_s3(summary+ '.json', bucket, output_key)
+        #table.update_item(
+        #    Key={'id': key},
+        #    UpdateExpression='set #status = :status',
+        #    ExpressionAttributeNames={'#status': 'status'},
+        #    ExpressionAttributeValues={':status': 'Success'}
+        #)
         return {'result' : "Success", 'Output' : output_key} 
     except IndexError: 
         logger.info("Index Error")
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status, #err = :err',
-            ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
-            ExpressionAttributeValues={':status': 'Error', ':err': 'Page out of range'}
-        )
+        #table.update_item(
+        #    Key={'id': key},
+        #    UpdateExpression='set #status = :status, #err = :err',
+        #    ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
+        #    ExpressionAttributeValues={':status': 'Error', ':err': 'Page out of range'}
+        #)
         return {'result': 'Error'}
     except (botocore.exceptions.ClientError, botocore.exceptions.ParamValidationError):
         logger.info("Botocore error")
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status, #err = :err',
-            ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
-            ExpressionAttributeValues={':status': 'Error', ':err': 'AWS Botocore Error'}
-        )
+        #table.update_item(
+        #    Key={'id': key},
+        #    UpdateExpression='set #status = :status, #err = :err',
+        #    ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
+        #    ExpressionAttributeValues={':status': 'Error', ':err': 'AWS Botocore Error'}
+        #)
         return {'result': 'Error'}
     except Exception as e: 
         logger.error(e)
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status, #err = :err',
-            ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
-            ExpressionAttributeValues={':status': 'Error', ':err': 'Could not convert data'}
-        )
+        #table.update_item(
+        #    Key={'id': key},
+        #    UpdateExpression='set #status = :status, #err = :err',
+        #    ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
+        #    ExpressionAttributeValues={':status': 'Error', ':err': 'Could not convert data'}
+        #)
         return {'result': 'Error'}
