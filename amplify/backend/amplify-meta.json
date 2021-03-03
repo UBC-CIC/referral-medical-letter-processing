@@ -22,7 +22,7 @@
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-ibdcentre-dev-221621-deployment/amplify-cfn-templates/auth/ibdcentre98a4cd1a-cloudformation-template.yml",
         "logicalId": "authibdcentre98a4cd1a"
       },
-      "lastPushTimeStamp": "2021-02-26T20:16:15.275Z",
+      "lastPushTimeStamp": "2021-03-03T22:43:17.800Z",
       "output": {
         "UserPoolId": "ca-central-1_DqL1zruS5",
         "AppClientIDWeb": "44vp1i0c3mbilsqafnsfem0iva",
@@ -42,7 +42,7 @@
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-ibdcentre-dev-221621-deployment/amplify-cfn-templates/storage/s3-cloudformation-template.json",
         "logicalId": "storages3df06e70a"
       },
-      "lastPushTimeStamp": "2021-02-26T20:16:15.278Z",
+      "lastPushTimeStamp": "2021-03-03T22:43:17.802Z",
       "output": {
         "BucketName": "ibdcentreb3cbdd9c0c2a495498c88bf5c73a4aea221621-dev",
         "Region": "ca-central-1"
@@ -71,7 +71,7 @@
         "GraphQLAPIIdOutput": "3funs5xpsbel5fj7nu47kunuli",
         "GraphQLAPIEndpointOutput": "https://4dctb7zw75c7zptpb3ftoegpma.appsync-api.ca-central-1.amazonaws.com/graphql"
       },
-      "lastPushTimeStamp": "2021-02-26T20:16:15.279Z",
+      "lastPushTimeStamp": "2021-03-03T22:43:17.803Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-ibdcentre-dev-221621-deployment/amplify-cfn-templates/api/cloudformation-template.json",
         "logicalId": "apiibdcentre"

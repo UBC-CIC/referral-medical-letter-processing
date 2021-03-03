@@ -110,14 +110,6 @@ def insert_into_s3(obj, bucket, objname):
     s3_client.put_object(Body=obj, Bucket=bucket, Key=objname)
     logger.info(f'Inserted {objname} to S3 bucket {bucket}')
 
-def get_s3_object(bucket, key, filename):
-    s3_client = boto3.client('s3')
-    try:    
-        with open(filename, 'wb') as f:
-            s3_client.download_fileobj(bucket, key, f)
-    except Exception as e: 
-        raise e 
-
 def get_json_s3(bucket, key):
     s3 = boto3.resource('s3')
     content_object = s3.Object(bucket, key)
@@ -244,20 +236,20 @@ def handler(event, context):
     logger.info(f'Key for JSON is {json_key}')
     logger.info(f'Amplify User is: {amplify_user}')
     logger.info(f'Json Content is {json_content}')
-    logger.info(f'Patient ID is {int(json_content["PatientID"])}')
+    #logger.info(f'Patient ID is {int(json_content["PatientID"])}')
     # Get contents of JSON 
     key = json_content["key"]
     #patientID = json_content["PatientID"]
     logger.info(f'Key for file is {key}')
     #output_path = '/tmp/s3_' + key
-    file_path = '/tmp/' + key
+    #file_path = '/tmp/' + key
     
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(DYNAMOTABLE)
 
 
     try:
-        get_s3_object(bucket, "protected/"+amplify_user+"/"+key, file_path)
+        #get_s3_object(bucket, "protected/"+amplify_user+"/"+key, file_path)
         jobId = startJob(bucket, "protected/"+amplify_user+"/"+key)
         logger.info(f'Started job with id: {jobId}')
         if(isJobComplete(jobId)):

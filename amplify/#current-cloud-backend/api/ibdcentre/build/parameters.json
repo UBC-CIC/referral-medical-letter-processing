@@ -13,5 +13,5 @@
         "Ref": "AuthRoleName"
     },
     "S3DeploymentBucket": "amplify-ibdcentre-dev-221621-deployment",
-    "S3DeploymentRootKey": "amplify-appsync-files/dc1e43021a0fb2856e5df55302ed0dce5d319d0b"
+    "S3DeploymentRootKey": "amplify-appsync-files/846408d811ebb3d1c76b5319931d07b6da2e67b2"
 }
