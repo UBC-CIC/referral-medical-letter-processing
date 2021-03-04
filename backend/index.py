@@ -14,6 +14,8 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 DYNAMOTABLE= os.getenv('DYNAMO_TABLE_NAME')
+comprehend_medical = boto3.client('comprehendmedical')
+comprehend = boto3.client('comprehend')
 
 # textract operations
 def startJob(s3BucketName, objectName):
@@ -60,6 +62,7 @@ def getJobResults(jobId):
         response = client.get_document_text_detection(JobId=jobId, NextToken=nextToken)
         pages.append(response)
         logger.info(pages)
+        logger.info(f'detecting text')
         nextToken = None
         if('NextToken' in response):
             nextToken = response['NextToken']
@@ -79,9 +82,6 @@ def textExtractHelper(response):
     return text
 
 # comprehend setup functions
-
-comprehend_medical = boto3.client('comprehendmedical')
-comprehend = boto3.client('comprehend')
 def findEntities(data):
     if not data:
         return []
@@ -164,6 +164,7 @@ def process_file(text):
     # AWS Comprehend Medical
     entity_text = findEntities(text)
     rxnorm_text = findRx(text)
+    logger.info(entity_text)
     # icd10_text = findIcd10(text) # Currently not used in implementation
     # Finding all instances of medication given to patient 
     for entity in rxnorm_text:
