@@ -86,7 +86,7 @@ def findEntities(data):
     if not data:
         return []
     try:
-        result = comprehend_medical.detect_entities(Text=data)
+        result = comprehend_medical.detect_entities_v2(Text=data)
     except Exception as e:
         logger.error(e)
     return result['Entities']
