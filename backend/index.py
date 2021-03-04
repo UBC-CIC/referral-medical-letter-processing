@@ -85,7 +85,10 @@ def textExtractHelper(response):
 def findEntities(data):
     if not data:
         return []
-    result = comprehend_medical.detect_entities_v2(Text=data)
+    try:
+        result = comprehend_medical.detect_entities(Text=data)
+    except Exception as e:
+        logger.error(e)
     return result['Entities']
 def findIcd10(data):
     if not data: 
