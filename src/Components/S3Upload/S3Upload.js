@@ -42,7 +42,6 @@ class S3Upload extends Component {
 
         this.state = {
             fileInput: {},
-            confidence: 50,
             displayFileOptions: false,
             invalidFileType: false,
             fileName: "",
@@ -62,8 +61,8 @@ class S3Upload extends Component {
     }
 
     handleChange(e) {
-        var conf = e.target.value;
-        this.setState({confidence: conf});
+        let patientID = e.target.value;
+        this.setState({patientID: patientID});
     }
 
     handlePageSelectorChange = (e) => {
@@ -156,9 +155,8 @@ class S3Upload extends Component {
     async handleSubmit(e) {
         e.preventDefault();
         const {initiateProcessing, addProcessingStatus, updateProcessingStatus} = this.props;
-        const {pageOption} = this.state;
+        const {pageOption, patientID} = this.state;
         initiateProcessing();
-        const confidence = parseInt(document.getElementById("confidence").value);
         let pages = [];
         if (pageOption !== "all") {
             let pageInput = document.getElementById("pages").value.split(",");
@@ -196,7 +194,8 @@ class S3Upload extends Component {
                 info = {
                     key: result.key,
                     keyName: keyName, 
-                    confidence: confidence,
+                    patientID: patientID,
+                    confidence: 50,
                     pages: pages,
                     file_type: mimeType
                 }
@@ -425,29 +424,6 @@ class S3Upload extends Component {
                                                                          <br/>
                                                                          <br/>
                                                                          <Grid>
-                                                                             <Grid.Row style={{paddingBottom: "0px", paddingTop: "0px"}}>
-                                                                                 <Grid.Column textAlign={"left"} verticalAlign={"middle"}>
-                                                        <span>
-                                                            <label className={"label"} htmlFor="confidence"><strong>*Confidence (0-100):</strong></label>
-                                                            <TextOnlyTooltip title="Confidence acts as a filter of the results. The recommended default value is 50." aria-setsize="15" placement="right">
-                                                            <IconButton style={{padding: "5px"}}>
-                                                                <HelpIcon />
-                                                            </IconButton>
-                                                        </TextOnlyTooltip>
-                                                        </span>
-                                                                                 </Grid.Column>
-                                                                             </Grid.Row>
-                                                                             <Grid.Row style={{padding: "0px"}}>
-                                                                                 <Grid.Column textAlign={"left"} verticalAlign={"middle"}>
-                                                                                     <div className={"ui input input-value-box"}>
-                                                                                         <input type="number" id="confidence" min="0" max="100"
-                                                                                                value={confidence} label="Confidence (0-100)"
-                                                                                                onChange={this.handleChange}
-                                                                                         required={true}
-                                                                                         />
-                                                                                     </div>
-                                                                                 </Grid.Column>
-                                                                             </Grid.Row>
                                                                              <Grid.Row style={{paddingBottom: "0px"}}>
                                                                                  <Grid.Column textAlign={"left"} verticalAlign={"middle"}>
                                                                                     <span>
