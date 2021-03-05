@@ -182,6 +182,7 @@ def process_file(text):
 
     medical_condition = []
     current_medication = []
+    time.sleep(10)
 
     for entity in entity_text:
         # Check if we have medication given, and then find any that have timestamps 
@@ -262,7 +263,7 @@ def handler(event, context):
         text = textExtractHelper(response)
         summary = process_file(text)
         logger.info(summary)
-        output_key = 'protected/'+ amplify_user + '/summary/' + json_content["keyName"] + '.json'
+        output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
         insert_into_s3(summary, bucket, output_key)
         table.update_item(
             Key={'id': key},
