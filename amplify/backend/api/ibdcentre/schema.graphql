@@ -5,7 +5,7 @@ type Status @model
   { allow: owner }
 ]) {
   id: ID!
+  patientID: String!
   status: String
   errorMessage: String
-  expirationTime: Int!
 }
