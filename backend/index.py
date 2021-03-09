@@ -244,7 +244,7 @@ def handler(event, context):
     logger.info(f'Amplify User is: {amplify_user}')
     logger.info(f'Json Content is {json_content}')
     #logger.info(f'Patient ID is {int(json_content["confidence"])}')
-    logger.info(f'Patient ID is {int(json_content["PatientID"])}')
+    logger.info(f'Patient ID is {int(json_content["patientID"])}')
     # Get contents of JSON 
     key = json_content["key"]
     #patientID = json_content["PatientID"]
