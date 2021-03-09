@@ -23,8 +23,6 @@ source env/bin/activate
 
 # Creating the package
 mkdir -p package
-pip3.8 install pdf2image --target package/
-pip3.8 install pypdf4 --target package/
 
 # Moving the poppler libraries in the package
 cp -r poppler_binaries/ package/
@@ -42,4 +40,4 @@ rm -rf package/
 
 # Updating lambda function
 # Read More at: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
-aws lambda update-function --function-name $LAMBDA_NAME --zip-file fileb://function.zip
+aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://function.zip

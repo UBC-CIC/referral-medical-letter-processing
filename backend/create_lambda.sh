@@ -15,6 +15,7 @@ aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAcce
 aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess --role-name ibd-lambda-role
 aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendFullAccess --role-name ibd-lambda-role
 aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAccess --role-name ibd-lambda-role
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendMedicalFullAccess --role-name ibd-lambda-role
 aws iam delete-role --role-name ibd-lambda-role
 
 aws iam create-role --role-name ibd-lambda-role --assume-role-policy-document file://role-policy.json
@@ -24,6 +25,7 @@ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAcce
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess --role-name ibd-lambda-role
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendFullAccess --role-name ibd-lambda-role
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAccess --role-name ibd-lambda-role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendMedicalFullAccess --role-name ibd-lambda-role
 
 sleep 5
 

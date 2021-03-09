@@ -129,7 +129,7 @@ def find_nth(haystack, needle, n):
 
 
 # Added code for summary response
-def process_file(text):
+def process_file(text, ID):
 
     # Comprehend Medical and Comprehend functions and setup
     mySum = {}
@@ -207,6 +207,8 @@ def process_file(text):
                 for trait in entity["Traits"]:
                     if trait["Name"] == "DIAGNOSIS" and entity["Category"] == "MEDICAL_CONDITION":
                         medical_condition.append(entity["Text"].lower())
+    mySum["Patient ID"] = ID
+    mySum["Appointment Date"] = text[1:30]
 
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
@@ -241,8 +243,8 @@ def handler(event, context):
     logger.info(f'Key for JSON is {json_key}')
     logger.info(f'Amplify User is: {amplify_user}')
     logger.info(f'Json Content is {json_content}')
-    logger.info(f'Patient ID is {int(json_content["confidence"])}')
-    #logger.info(f'Patient ID is {int(json_content["PatientID"])}')
+    #logger.info(f'Patient ID is {int(json_content["confidence"])}')
+    logger.info(f'Patient ID is {int(json_content["PatientID"])}')
     # Get contents of JSON 
     key = json_content["key"]
     #patientID = json_content["PatientID"]
@@ -262,7 +264,7 @@ def handler(event, context):
             response = getJobResults(jobId)
         logger.info(response)
         text = textExtractHelper(response)
-        summary = process_file(text)
+        summary = process_file(text, int(json_content["PatientID"]))
         logger.info(summary)
         output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
         insert_into_s3(summary, bucket, output_key)
