@@ -208,7 +208,7 @@ def process_file(text, ID):
                     if trait["Name"] == "DIAGNOSIS" and entity["Category"] == "MEDICAL_CONDITION":
                         medical_condition.append(entity["Text"].lower())
     mySum["Patient ID"] = ID
-    mySum["Appointment Date"] = text[1:30]
+    mySum["Appointment Date"] = text[19:30]
 
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
@@ -264,9 +264,9 @@ def handler(event, context):
             response = getJobResults(jobId)
         logger.info(response)
         text = textExtractHelper(response)
-        summary = process_file(text, int(json_content["PatientID"]))
+        summary = process_file(text, int(json_content["patientID"]))
         logger.info(summary)
-        output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
+        output_key = 'protected/json/' + json_content["keyName"] + '.json'
         insert_into_s3(summary, bucket, output_key)
         table.update_item(
             Key={'id': key},
