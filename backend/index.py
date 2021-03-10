@@ -244,7 +244,7 @@ def handler(event, context):
     logger.info(f'Amplify User is: {amplify_user}')
     logger.info(f'Json Content is {json_content}')
     #logger.info(f'Patient ID is {int(json_content["confidence"])}')
-    logger.info(f'Patient ID is {int(json_content["patientID"])}')
+    logger.info(f'Patient ID is {json_content["patientID"]}')
     # Get contents of JSON 
     key = json_content["key"]
     #patientID = json_content["PatientID"]
@@ -264,9 +264,9 @@ def handler(event, context):
             response = getJobResults(jobId)
         logger.info(response)
         text = textExtractHelper(response)
-        summary = process_file(text, int(json_content["patientID"]))
+        summary = process_file(text, json_content["patientID"])
         logger.info(summary)
-        output_key = 'protected/json/' + json_content["keyName"] + '.json'
+        output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
         insert_into_s3(summary, bucket, output_key)
         table.update_item(
             Key={'id': key},
