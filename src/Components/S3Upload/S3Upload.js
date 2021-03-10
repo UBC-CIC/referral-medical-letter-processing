@@ -45,7 +45,8 @@ class S3Upload extends Component {
             displayFileOptions: false,
             invalidFileType: false,
             fileName: "",
-            isProcessing: false,
+            selectedFiles: [],
+            isUploading: false,
             loadingProgress: 0,
             loadingInterval: null,
             displaySpecificPages: false,
@@ -99,7 +100,7 @@ class S3Upload extends Component {
                     loadingProgress: 100,
                 });
                 this.setState({
-                    isProcessing: false,
+                    isUploading: false,
                     loadingProgress: 0,
                 })
                 clearProcessingState();
@@ -113,7 +114,7 @@ class S3Upload extends Component {
                 clearInterval(loadingInterval);
                 this.setState({
                     loadingProgress: 0,
-                    isProcessing: false,
+                    isUploading: false,
                     status: "Error",
                 });
                 processingFinished();
@@ -130,26 +131,38 @@ class S3Upload extends Component {
     // validate file type
     fileUploaded = (e) => {
         e.preventDefault();
-        let file = document.getElementById("fileUpload");
-        let fileName = file.value;
-        let dotIndex = fileName.lastIndexOf(".")+1;
-        let fileExt = fileName.substr(dotIndex, fileName.length).toLowerCase();
-        if (fileExt === "pdf" || fileExt === "jpg" || fileExt === "jpeg" || fileExt === "png") {
-            this.setState({
-                displayFileOptions: true,
-                invalidFileType: false,
-                fileName: fileName,
-                displaySpecificPages: false,
-                pageOption: "all",
-                pageFilter: "none",
-                status: "Ready",
-            })
-        } else {
-            file.value = "";
-            this.setState({
-                invalidFileType: true,
-            })
+        let numFiles = e.target.files.length;
+        let selectedFiles = [];
+        if (numFiles > 0) {
+            for (let i = 0; i < numFiles; i++) {
+                let file  = e.target.files[i];
+                let fileName = file.name;
+                let dotIndex = fileName.lastIndexOf(".")+1;
+                let fileExt = fileName.substr(dotIndex, fileName.length).toLowerCase();
+                if (fileExt === "pdf" || fileExt === "jpg" || fileExt === "jpeg" || fileExt === "png") {
+                    selectedFiles.push(fileName);
+                    this.setState({
+                        displayFileOptions: true,
+                        invalidFileType: false,
+                        fileName: fileName,
+                        displaySpecificPages: false,
+                        pageOption: "all",
+                        pageFilter: "none",
+                        status: "Ready",
+                    })
+                } else {
+                    file.value = "";
+                    selectedFiles = [];
+                    this.setState({
+                        invalidFileType: true,
+                        selectedFiles: [],
+                    })
+                }
+            }
         }
+        this.setState({
+            selectedFiles: selectedFiles,
+        })
     }
 
     async handleSubmit(e) {
@@ -163,56 +176,53 @@ class S3Upload extends Component {
             pages = this.formatPages(pageInput);
         }
         const visibility = 'protected';
-        const selectedFile = document.getElementById("fileUpload").files;
-        if (!selectedFile.length) {
+        const selectedFiles = document.getElementById("fileUpload").files;
+        if (!selectedFiles.length) {
             return alert("Please choose a file to upload first!");
         }
         this.setState({
-            isProcessing: true,
-            state: "Uploading",
+            isUploading: true,
+            status: "Uploading",
         })
-        const file = selectedFile[0];
-        const fileName = file.name;
-        let info;
-        const [, , , extension] = /([^.]+)(\.(\w+))?$/.exec(fileName);
-        const mimeType = fileName.slice(fileName.indexOf('.')+1);
-        const keyName = uuid().concat("_").concat(fileName.replace(/\.[^/.]+$/, "")).concat("-" + mimeType);
-        const key = `${keyName}${extension && '.'}${extension}`;
-        addProcessingStatus({id: key, status: "Uploading", expirationTime: Math.floor(new Date().getTime()/1000.0) + 604800});
-        const thisState = this;
-        Storage.put(key, file, {
-            progressCallback(progress) {
-                if (((progress.loaded/progress.total)*100) <= 50) {
-                    thisState.setState({
-                        loadingProgress: (progress.loaded/progress.total)*100,
-                    });
+        this.setUploadingTimeout();
+        for (let file of selectedFiles) {
+            const fileName = file.name;
+            let info;
+            const [, , , extension] = /([^.]+)(\.(\w+))?$/.exec(fileName);
+            const mimeType = fileName.slice(fileName.indexOf('.')+1);
+            const keyName = uuid().concat("_").concat(fileName.replace(/\.[^/.]+$/, "")).concat("-" + mimeType);
+            const key = `${keyName}${extension && '.'}${extension}`;
+            addProcessingStatus({id: key, patientID: patientID, status: "Uploading"});
+            Storage.put(key, file, {
+                level: visibility,
+            }).then(
+                (result) => {
+                    info = {
+                        key: result.key,
+                        keyName: keyName,
+                        patientID: patientID,
+                        confidence: 50,
+                        pages: pages,
+                        file_type: mimeType
+                    }
+                    updateProcessingStatus({id: key, status: "Processing"});
+                    Storage.put(`file_info/${keyName}.json`, JSON.stringify(info), { level: visibility, contentType: 'json' })
+                },
+                (err) => {
+                    updateProcessingStatus({id: key, status: "Error", errorMessage: "File processing error occurred: " + err.message});
+                    return alert('Error uploading file: ', err.message);
                 }
-            },
-            level: visibility,
-        }).then(
-            (result) => {
-                info = {
-                    key: result.key,
-                    keyName: keyName, 
-                    patientID: patientID,
-                    confidence: 50,
-                    pages: pages,
-                    file_type: mimeType
-                }
-                updateProcessingStatus({id: key, status: "Processing"});
-                Storage.put(`file_info/${keyName}.json`, JSON.stringify(info), { level: visibility, contentType: 'json' })
-            },
-            (err) => {
-                updateProcessingStatus({id: key, status: "Error", errorMessage: "File processing error occurred: " + err.message});
-                return alert('Error uploading file: ', err.message);
-            }
-        ).then(() => {
-            this.setProcessingTimeout();
-            this.setState({
-                displayFileOptions: false,
-                fileName: "",
+            ).then(() => {
+                this.setState({
+                    displayFileOptions: false,
+                });
             });
-        });
+        }
+        this.setState({
+            isUploading: false,
+            loadingProgress: 0,
+            selectedFiles: [],
+        })
     }
 
     formatPages = (pageInput) => {
@@ -250,8 +260,8 @@ class S3Upload extends Component {
         } else return pageFilter === "none";
     }
 
-    setProcessingTimeout = () => {
-        let loadingInterval = window.setInterval(setProgressBar, 4800);
+    setUploadingTimeout = () => {
+        let loadingInterval = window.setInterval(setProgressBar, 500);
         this.setState({
             loadingInterval: loadingInterval,
         })
@@ -269,8 +279,12 @@ class S3Upload extends Component {
     }
 
     render() {
-        const {displayFileOptions, invalidFileType, fileName, isProcessing, loadingProgress,
-            confidence, displaySpecificPages, pageOption, pageFilter, patientID, status} = this.state;
+        const {displayFileOptions, invalidFileType, isUploading, loadingProgress,
+            selectedFiles, displaySpecificPages, pageOption, pageFilter, patientID, status} = this.state;
+        let selectedFilesName = "";
+        for (let name of selectedFiles) {
+            selectedFilesName += name + ", ";
+        }
         return (
             <Grid style={{marginLeft: "1.66%"}}>
                 <Grid.Row>
@@ -296,12 +310,12 @@ class S3Upload extends Component {
                                 <Grid.Row className={"upload-input-info"}>
                                     <Grid.Column className={"upload-input-info-box"} textAlign={"left"} verticalAlign={"middle"}>
                                         <div className={"upload-input-info-box-inner"}>
-                                            {(isProcessing)?
+                                            {(isUploading)?
                                                 <Grid>
                                                     <Grid.Row style={{paddingBottom: "0px"}}>
                                                         <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
                                                             <span className={"loading-message"}>
-                                                                <strong>Please wait while your file is processed <span className={"loadingDots"}>...</span></strong>
+                                                                <strong>Please wait while your file is uploaded <span className={"loadingDots"}>...</span></strong>
                                                             </span>
                                                         </Grid.Column>
                                                     </Grid.Row>
@@ -313,7 +327,7 @@ class S3Upload extends Component {
                                                                 </Box>
                                                                 <Box minWidth={35}>
                                                                     <Typography variant="body2" color="textSecondary"
-                                                                    className={"loading-num"}>{`${Math.round(
+                                                                                className={"loading-num"}>{`${Math.round(
                                                                         loadingProgress,
                                                                     )}%`}</Typography>
                                                                 </Box>
@@ -333,7 +347,7 @@ class S3Upload extends Component {
                                                  <Grid>
                                                      <Grid.Row>
                                                          <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
-                                                             <input style={{ display: 'none' }} id="fileUpload" type="file" onChange={this.fileUploaded} />
+                                                             <input style={{ display: 'none' }} id="fileUpload" type="file" onChange={this.fileUploaded} multiple={true} />
                                                              <label htmlFor="fileUpload">
                                                                  <Button variant={"outlined"} style={{width: "100%", marginLeft: "-10px"}} component={"span"}
                                                                  ><strong>Upload</strong></Button>
@@ -345,8 +359,8 @@ class S3Upload extends Component {
                                                             </span>
                                                                  :
                                                                  null}
-                                                             {(fileName && !invalidFileType)?
-                                                                 <div><span className={"file-selected-desc"}><strong>File Selected: </strong>{fileName}</span></div>
+                                                             {((selectedFiles.length > 0) && !invalidFileType)?
+                                                                 <div><span className={"file-selected-desc"}><strong>Files Selected: </strong>{selectedFilesName}</span></div>
                                                                  : null}
                                                          </Grid.Column>
                                                      </Grid.Row>
