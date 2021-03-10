@@ -85,10 +85,7 @@ def textExtractHelper(response):
 def findEntities(data):
     if not data:
         return []
-    try:
-        result = comprehend_medical.detect_entities_v2(Text=data)
-    except Exception as e:
-        logger.error(e)
+    result = comprehend_medical.detect_entities_v2(Text=data)
     return result['Entities']
 def findIcd10(data):
     if not data: 
@@ -127,12 +124,19 @@ def find_nth(haystack, needle, n):
         n -= 1
     return start
 
-
 # Added code for summary response
 def process_file(text, ID):
 
     # Comprehend Medical and Comprehend functions and setup
     mySum = {}
+
+    # Using these dictionaries for the summary
+    #medications = {} 
+    #negations = {}
+    #problem_history = []
+    #page_sum = set()
+    #jobIds = []
+    #textract = boto3.client('textract')
     # Endoscopic Procedures (possibly store this in Django or a DB) and call as a set 
     endoscopy = {'anoscopy',
                 'arthroscopy',
@@ -148,74 +152,53 @@ def process_file(text, ID):
                 'proctoscopy',
                 'sigmoidoscopy',
                 'thoracoscopy'}
-
-    # Using these dictionaries for the summary
-    #medical_conditions = {} 
-    #medications = {} 
-    endoscopic_procedures = []
-    #negations = {}
-    #problem_history = []
-    page_sum = set()
-    medication_instances = {}
-    #jobIds = []
-    #textract = boto3.client('textract')
-    
     logger.info(f'{text[1:30]}')
-    page_text = ""
-    page_text = text
 
     # AWS Comprehend Medical
     entity_text = findEntities(text)
     rxnorm_text = findRx(text)
+    
     logger.info(entity_text)
-    # icd10_text = findIcd10(text) # Currently not used in implementation
+    logger.info(rxnorm_text)
+    
     # Finding all instances of medication given to patient 
+    medication_instances = []
+    medical_condition = []
+    procedures = []
+    
     for entity in rxnorm_text:
         if entity["Score"] >= 0.8:
             rxnorm = entity["Text"]
             for attribute in entity["Attributes"]:
                 if attribute["Type"] == "DOSAGE" or attribute["Type"] == "ROUTE_OR_MODE" or attribute["Type"] == "FREQUENCY":
                     rxnorm = rxnorm + " " + attribute["Text"]
-            # Store instances based off of offsets 
-            key = entity["BeginOffset"]
-            medication_instances[key] = rxnorm
-
-    medical_condition = []
-    current_medication = []
-    time.sleep(10)
-
+            # Store instances in a list
+            medication_instances.append(rxnorm)
+    logger.info(medication_instances)
     for entity in entity_text:
-        # Check if we have medication given, and then find any that have timestamps 
-        if medication_instances: 
-            if entity["Type"] == "TIME_TO_MEDICATION_NAME" and entity["Attributes"]: 
-                for attribute in entity["Attributes"]:
-                    if attribute["RelationshipType"] == "OVERLAP" and attribute["Category"] == "MEDICATION":
-                        # Check if the medication is in the medication dictionary based off of offset
-                        key = attribute["BeginOffset"]
-                        if key in medication_instances: 
-                            current_medication.append(entity["Text"] + " " + medication_instances[key])
         if entity["Score"] >= 0.8:
-            # Find instances of endoscopic procedures that have time expressions 
+            # Find instances of (endoscopic?) procedures that have time expressions 
             if entity["Category"] == "TIME_EXPRESSION" and entity["Type"] == "TIME_TO_TEST_NAME":
                 for attribute in entity["Attributes"]:
                     if attribute["Category"] == "TEST_TREATMENT_PROCEDURE" and attribute["RelationshipType"] == "OVERLAP":
                         attributeText = attribute["Text"].lower()
                         if attributeText in endoscopy:
-                            endoscopic_procedures.append(entity["Text"] + " " + attribute["Text"])
+                            procedures.append(entity["Text"] + " " + attribute["Text"])
             # Otherwise find Diagnosis that are in the category of Medical Condition
-            elif entity["Traits"]:
+            if entity["Traits"]:
                 for trait in entity["Traits"]:
                     if trait["Name"] == "DIAGNOSIS" and entity["Category"] == "MEDICAL_CONDITION":
                         medical_condition.append(entity["Text"].lower())
+    
+    logger.info(medical_condition)
+    logger.info(procedures) 
     mySum["Patient ID"] = ID
     mySum["Appointment Date"] = text[19:30]
-
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
     pattern2 = re.compile(r'\d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d')
     try:
-        page_sum = re.findall(pattern2, page_text)
-        pat_sum = page_sum
+        pat_sum = re.findall(pattern2, text)
         for pat in pat_sum:
             mySum["Problem History"] = pat[0]
             mySum["Lifestyle Notes"] = pat[4]
@@ -223,11 +206,10 @@ def process_file(text, ID):
             mySum["Extra Intestinal Manifestations"] = pat[3]
             mySum["Past Surgical History"] = pat[2]
     except Exception as e:
-        raise e
-
+        logger.info(e)
+    mySum["Medication instances"] = medication_instances
     mySum["Medical condition"] = medical_condition
-    mySum["Current Medication"] = current_medication
-    mySum["Endoscopic Procedures"] = endoscopic_procedures
+    mySum["Endoscopic? Procedures"] = procedures
 
     return json.dumps(mySum)
 
@@ -243,24 +225,21 @@ def handler(event, context):
     logger.info(f'Key for JSON is {json_key}')
     logger.info(f'Amplify User is: {amplify_user}')
     logger.info(f'Json Content is {json_content}')
-    #logger.info(f'Patient ID is {int(json_content["confidence"])}')
-    logger.info(f'Patient ID is {json_content["patientID"]}')
+    
+    patientID = json_content["patientID"]
+    logger.info(f'Patient ID is {patientID}')
     # Get contents of JSON 
     key = json_content["key"]
-    #patientID = json_content["PatientID"]
     logger.info(f'Key for file is {key}')
-    #output_path = '/tmp/s3_' + key
-    #file_path = '/tmp/' + key
     
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(DYNAMOTABLE)
-
 
     try:
         #get_s3_object(bucket, "protected/"+amplify_user+"/"+key, file_path)
         jobId = startJob(bucket, "protected/"+amplify_user+"/"+key)
         logger.info(f'Started job with id: {jobId}')
-        if(isJobComplete(jobId)):
+        if(isJobComplete(jobId) == "SUCCEEDED"):
             response = getJobResults(jobId)
         logger.info(response)
         text = textExtractHelper(response)
