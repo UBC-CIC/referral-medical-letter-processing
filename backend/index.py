@@ -175,6 +175,8 @@ def process_file(text, ID):
             # Store instances in a list
             medication_instances.append(rxnorm)
     logger.info(medication_instances)
+    # removes duplicate medication name
+    medication_instances = list(dict.fromkeys(medication_instances))
     for entity in entity_text:
         if entity["Score"] >= 0.8:
             # Find instances of (endoscopic?) procedures that have time expressions 
@@ -189,7 +191,7 @@ def process_file(text, ID):
                 for trait in entity["Traits"]:
                     if trait["Name"] == "DIAGNOSIS" and entity["Category"] == "MEDICAL_CONDITION":
                         medical_condition.append(entity["Text"].lower())
-    
+    medical_condition = list(dict.fromkeys(medical_condition))
     logger.info(medical_condition)
     logger.info(procedures) 
     mySum["Patient ID"] = ID
@@ -209,7 +211,7 @@ def process_file(text, ID):
         logger.info(e)
     mySum["Medication instances"] = medication_instances
     mySum["Medical condition"] = medical_condition
-    mySum["Endoscopic? Procedures"] = procedures
+    #mySum["Endoscopic Procedures"] = procedures
 
     return json.dumps(mySum)
 
@@ -228,7 +230,7 @@ def handler(event, context):
     
     patientID = json_content["patientID"]
     logger.info(f'Patient ID is {patientID}')
-    # Get contents of JSON 
+    # Get contents of JSON  
     key = json_content["key"]
     logger.info(f'Key for file is {key}')
     
