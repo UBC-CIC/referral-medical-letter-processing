@@ -8,9 +8,10 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import IconButton from '@material-ui/core/IconButton';
 import {enqueueAppNotification} from "../../actions/notificationActions";
+import {fetchAllItems} from "../../actions/appStateActions";
 
 import "./S3Table.css";
-import {processingFinished, fetchStatus} from "../../actions/appStateActions";
+import {fetchStatus} from "../../actions/appStateActions";
 import {withStyles} from "@material-ui/core/styles";
 import {Tooltip} from "@material-ui/core";
 
@@ -46,53 +47,23 @@ class S3Table extends Component {
 
     async componentDidMount() {
         try {
+            const {fetchAllItems} = this.props;
+            /*fetchAllItems();*/
             this.onGetData();
         } catch (err) {
             console.log(err);
         }
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.currentFileKey !== prevProps.currentFileKey) {
-           this.setState({
-               currentFileKey: this.props.currentFileKey,
-           })
-        }
-
-        if (this.props.isProcessingInitiated !== prevProps.isProcessingInitiated) {
-            if (this.props.isProcessingInitiated) {
-                const interval = window.setInterval(this.fetchData, 30000);
-                this.setState({
-                    refreshBtnDisabled: true,
-                    interval: interval,
-                })
-            } else {
-                const {interval} = this.state;
-                clearInterval(interval);
-                this.setState({
-                    refreshBtnDisabled: false,
-                    interval: null,
-                })
-            }
-        }
-
-        if (this.props.status !== prevProps.status) {
-            if (this.props.status.status === "Success") {
-                this.onGetData();
-            }
-        }
-
-    }
-
-    fetchData = () => {
-        const {isProcessingInitiated, fetchStatus} = this.props;
+    /*fetchData = () => {
+        const { fetchStatus} = this.props;
         const {currentFileKey} = this.state;
         if (isProcessingInitiated) {
             if (currentFileKey) {
                 fetchStatus({id: currentFileKey});
             }
         }
-    }
+    }*/
 
     async onGetData() {
         var fileList = [];
@@ -119,23 +90,10 @@ class S3Table extends Component {
                     fileList.push(obj);
                 }
                 fileList.sort((a,b) => Date.parse(b.last_modified) - Date.parse(a.last_modified));
-                const {currentFileKey} =  that.state;
-                const {processingFinished, isProcessingInitiated, enqueueAppNotification} = that.props;
-                if (fileList.some(file => file.key === currentFileKey)) {
-                    this.setState({
-                        refreshBtnDisabled: false,
-                    })
-                    if (isProcessingInitiated) {
-                        enqueueAppNotification({type: "success", message: "File processing completed!"});
-                    }
-                    processingFinished();
-                }
                 this.setState({ files: fileList });
-                if (!isProcessingInitiated) {
-                    this.setState({
+                this.setState({
                         refreshBtnDisabled: false,
-                    })
-                }
+                })
             })
             .catch(err => console.log(err));
     }
@@ -181,7 +139,6 @@ class S3Table extends Component {
 
     render() {
         const {refreshBtnDisabled} = this.state;
-        const {isProcessingInitiated} = this.props;
         return (
                 <Grid style={{marginRight: "1.66%"}}>
                     <Grid.Row>
@@ -213,7 +170,7 @@ class S3Table extends Component {
                                             }
                                         </Grid.Column>
                                         <Grid.Column width={9} textAlign={"left"} verticalAlign={"middle"}>
-                                            <span className={"refresh-btn-message"}>{(isProcessingInitiated)? <span>Please wait while your file is processed.</span> : <span>Click on the refresh button to update the table.</span>}</span>
+                                            <span className={"refresh-btn-message"}>Click on the refresh button to update the table.</span>
                                         </Grid.Column>
                                         <Grid.Column width={4}>
 
@@ -321,17 +278,14 @@ class S3Table extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        isProcessingInitiated: state.appState.processingInitiated,
-//        notifications: state.notifications.alerts,
-        currentFileKey: state.appState.currentFileKey,
         status: state.appState.status,
     };
 };
 
 const mapDispatchToProps = {
-    processingFinished,
     enqueueAppNotification,
-    fetchStatus
+    fetchStatus,
+    fetchAllItems,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(S3Table);

@@ -5,8 +5,6 @@ import {Tooltip} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import { v4 as uuid } from 'uuid';
 import {Grid, Divider} from "semantic-ui-react";
-import HelpIcon from '@material-ui/icons/Help';
-import IconButton from '@material-ui/core/IconButton';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import ReportProblemIcon from '@material-ui/icons/ReportProblem';
 import "./S3Upload.css";
@@ -18,7 +16,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import {initiateProcessing, clearProcessingState, addProcessingStatus, updateProcessingStatus, processingFinished} from "../../actions/appStateActions";
+import { addProcessingStatus, updateProcessingStatus } from "../../actions/appStateActions";
 import {enqueueAppNotification} from "../../actions/notificationActions";
 
 
@@ -167,9 +165,8 @@ class S3Upload extends Component {
 
     async handleSubmit(e) {
         e.preventDefault();
-        const {initiateProcessing, addProcessingStatus, updateProcessingStatus} = this.props;
+        const {addProcessingStatus, updateProcessingStatus} = this.props;
         const {pageOption, patientID} = this.state;
-        initiateProcessing();
         let pages = [];
         if (pageOption !== "all") {
             let pageInput = document.getElementById("pages").value.split(",");
@@ -509,12 +506,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-    initiateProcessing,
-    clearProcessingState,
     addProcessingStatus,
     updateProcessingStatus,
     enqueueAppNotification,
-    processingFinished
 };
 
 

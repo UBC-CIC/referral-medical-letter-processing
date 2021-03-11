@@ -7,7 +7,7 @@ export const getStatus = /* GraphQL */ `
       id
       status
       errorMessage
-      expirationTime
+      patientID
       createdAt
       updatedAt
     }
@@ -24,7 +24,7 @@ export const listStatuss = /* GraphQL */ `
         id
         status
         errorMessage
-        expirationTime
+        patientID
         createdAt
         updatedAt
       }
