@@ -37,7 +37,7 @@
 
 .list-item {
     margin-left: 15px;
-    margin-right: 5px;
+    margin-right: -10px;
     padding-top: 8px;
     padding-bottom: 8px;
     border-radius: 4px;
@@ -59,7 +59,7 @@
 
 .files-list {
     overflow: auto;
-    max-height: 300px;
+    max-height: 500px;
 }
 
 @media only screen and (max-width: 768px) {

@@ -22,7 +22,6 @@ import {enqueueAppNotification} from "../../actions/notificationActions";
 
 
 
-
 const TextOnlyTooltip = withStyles({
     tooltip: {
         color: "black",

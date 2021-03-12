@@ -1,17 +1,17 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { Storage } from "aws-amplify";
-import { Grid, Divider } from "semantic-ui-react";
+import React, {Component} from "react";
+import {connect} from "react-redux";
+import {Storage} from "aws-amplify";
+import {Divider, Grid} from "semantic-ui-react";
 import RefreshIcon from '@material-ui/icons/Refresh';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import IconButton from '@material-ui/core/IconButton';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {enqueueAppNotification} from "../../actions/notificationActions";
-import {fetchAllItems} from "../../actions/appStateActions";
+import {fetchAllItems, fetchStatus} from "../../actions/appStateActions";
 
 import "./S3Table.css";
-import {fetchStatus} from "../../actions/appStateActions";
 import {withStyles} from "@material-ui/core/styles";
 import {Tooltip} from "@material-ui/core";
 
@@ -37,6 +37,9 @@ class S3Table extends Component {
             refreshBtnDisabled: false,
             refreshInterval: null,
             currentFileKey: null,
+            fileText: "",
+            fileData: {},
+            activeIndex: -1,
         }
 
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -94,7 +97,22 @@ class S3Table extends Component {
                 this.setState({
                         refreshBtnDisabled: false,
                 })
-            })
+            }).then(() => {
+                const {files} = this.state;
+                let fileObj = {};
+                let numFiles = files.length;
+                for (let i=0; i < numFiles; i++){
+                    let key = files[i].name;
+                    Storage.get("json/"+key, {download: true, level: "protected"}).then(file => {
+                        file.Body.text().then(text => {
+                            fileObj[files[i].name] = text;
+                        })
+                    });
+                }
+                this.setState({
+                    fileData: fileObj,
+                })
+        })
             .catch(err => console.log(err));
     }
 
@@ -125,6 +143,7 @@ class S3Table extends Component {
             });
     }
 
+
     async removeData(key) {
         Storage.remove("json/"+key, { level: 'protected' })
             .then()
@@ -134,6 +153,14 @@ class S3Table extends Component {
         if (index !== -1) {
             arr.splice(index, 1);
             this.setState({ files: arr });
+        }
+    }
+
+    handleToggle =  ( newIndex ) => {
+        if (newIndex === this.state.activeIndex) {
+            this.setState({ activeIndex: -1 });
+        } else {
+            this.setState({ activeIndex: newIndex });
         }
     }
 
@@ -185,7 +212,7 @@ class S3Table extends Component {
                                                         <Grid.Column width={4} textAlign={"left"} verticalAlign={"middle"}>
                                                             <span className={"list-header-title"}>Source File</span>
                                                         </Grid.Column>
-                                                        <Grid.Column width={5} textAlign={"left"} verticalAlign={"middle"}>
+                                                        <Grid.Column width={4} textAlign={"left"} verticalAlign={"middle"}>
                                                             <span className={"list-header-title"}>Date</span>
                                                         </Grid.Column>
                                                         <Grid.Column width={3} textAlign={"center"} verticalAlign={"middle"}>
@@ -199,6 +226,9 @@ class S3Table extends Component {
                                                                 <span className={"list-header-title delete-icon"}><DeleteOutlineIcon /></span>
                                                             </TextOnlyTooltip>
                                                         </Grid.Column>
+                                                        <Grid.Column width={1}>
+
+                                                        </Grid.Column>
                                                     </Grid.Row>
                                                 </Grid>
                                             </div>
@@ -207,64 +237,87 @@ class S3Table extends Component {
                                     </Grid.Row>
                                     </Grid>
                                     <Grid className={"files-list"}>
-                                    {this.state.files && this.state.files.map(({name, source, last_modified, size}) => {
-                                        let sourceOriginal = source;
-                                        if (source.length > 20) {
-                                            source = source.substr(0, 7) + "..." + source.substr(source.length - 8);
-                                        }
-                                        let localTime = new Date(last_modified).toLocaleString();
-                                        return(
-                                            <Grid.Row key={name} className={"list-item-container"}>
-                                                <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
-                                                    <div className={"list-item"}>
-                                                        <Grid>
-                                                            <Grid.Row columns={5} style={{paddingTop: "2px", paddingBottom: "2px", paddingLeft: "0px", marginLeft: "20px", marginRight: "20px", paddingRight: "0px"}}>
-                                                                <Grid.Column width={4} textAlign={"left"} verticalAlign={"middle"}>
-                                                                    <TextOnlyTooltip title={sourceOriginal} aria-setsize="15" placement="right" >
-                                                                    <span className={"list-header-title"}>{source}</span>
-                                                                    </TextOnlyTooltip>
-                                                                </Grid.Column>
-                                                                <Grid.Column width={5} textAlign={"left"} verticalAlign={"middle"}>
-                                                                    <span className={"list-header-title"}>{localTime}</span>
-                                                                </Grid.Column>
-                                                                <Grid.Column width={3} textAlign={"center"} verticalAlign={"middle"}>
-                                                                    <span className={"list-header-title"}>{size}</span>
-                                                                </Grid.Column>
-                                                                <Grid.Column width={2} textAlign={"center"} verticalAlign={"middle"}>
+                                            {this.state.files && this.state.files.map(({name, source, last_modified, size}, index) => {
+                                                let sourceOriginal = source;
+                                                if (source.length > 20) {
+                                                    source = source.substr(0, 7) + "..." + source.substr(source.length - 8);
+                                                }
+
+                                                let localTime = new Date(last_modified).toLocaleString();
+                                                return(
+                                                    <Grid key={name} style={{width: "100%", paddingRight: "0px"}}>
+                                                        <Grid.Row className={"list-item-container"} style={{width: "100%"}}>
+                                                            <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
+                                                                <div className={"list-item"}>
                                                                     <Grid>
-                                                                        <Grid.Row columns={1}>
-                                                                            <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
-                                                                                <IconButton
-                                                                                    onClick={() => this.downloadData(name)}
-                                                                                >
-                                                                                    <GetAppIcon style={{color: "#313a45"}} />
-                                                                                </IconButton>
-                                                                            </Grid.Column>
-                                                                        </Grid.Row>
-                                                                    </Grid>
-                                                                </Grid.Column>
-                                                                <Grid.Column width={2} textAlign={"right"} verticalAlign={"middle"}>
-                                                                    <Grid>
-                                                                        <Grid.Row columns={1}>
-                                                                            <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
-                                                                                <TextOnlyTooltip title={"Delete"} aria-setsize="15" placement="bottom">
-                                                                                    <IconButton
-                                                                                        onClick={() => this.removeData(name)}
-                                                                                    >
-                                                                                        <DeleteForeverIcon style={{color: "red"}} />
-                                                                                    </IconButton>
+                                                                        <Grid.Row columns={5} style={{paddingTop: "2px", paddingBottom: "2px", paddingLeft: "0px", marginLeft: "20px", marginRight: "20px", paddingRight: "0px"}}>
+                                                                            <Grid.Column width={4} textAlign={"left"} verticalAlign={"middle"}>
+                                                                                <TextOnlyTooltip title={sourceOriginal} aria-setsize="15" placement="right" >
+                                                                                    <span className={"list-header-title"}>{source}</span>
                                                                                 </TextOnlyTooltip>
                                                                             </Grid.Column>
+                                                                            <Grid.Column width={4} textAlign={"left"} verticalAlign={"middle"}>
+                                                                                <span className={"list-header-title"}>{localTime}</span>
+                                                                            </Grid.Column>
+                                                                            <Grid.Column width={3} textAlign={"center"} verticalAlign={"middle"}>
+                                                                                <span className={"list-header-title"}>{size}</span>
+                                                                            </Grid.Column>
+                                                                            <Grid.Column width={2} textAlign={"center"} verticalAlign={"middle"}>
+                                                                                <Grid>
+                                                                                    <Grid.Row columns={1}>
+                                                                                        <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
+                                                                                            <IconButton
+                                                                                                onClick={() => this.downloadData(name)}
+                                                                                            >
+                                                                                                <GetAppIcon style={{color: "#313a45"}} />
+                                                                                            </IconButton>
+                                                                                        </Grid.Column>
+                                                                                    </Grid.Row>
+                                                                                </Grid>
+                                                                            </Grid.Column>
+                                                                            <Grid.Column width={2} textAlign={"right"} verticalAlign={"middle"}>
+                                                                                <Grid>
+                                                                                    <Grid.Row columns={1}>
+                                                                                        <Grid.Column textAlign={"center"} verticalAlign={"middle"}>
+                                                                                            <TextOnlyTooltip title={"Delete"} aria-setsize="15" placement="bottom">
+                                                                                                <IconButton
+                                                                                                    onClick={() => this.removeData(name)}
+                                                                                                >
+                                                                                                    <DeleteForeverIcon style={{color: "red"}} />
+                                                                                                </IconButton>
+                                                                                            </TextOnlyTooltip>
+                                                                                        </Grid.Column>
+                                                                                    </Grid.Row>
+                                                                                </Grid>
+                                                                            </Grid.Column>
+                                                                            <Grid.Column width={1} verticalAlign={"middle"} textAlign={"left"}>
+                                                                                    <IconButton
+                                                                                    onClick={() => this.handleToggle(index)}
+                                                                                    >
+                                                                                        {(this.state.activeIndex === index)?
+                                                                                            <ExpandMoreIcon style={{transform: "rotate(180deg)"}} />
+                                                                                            :
+                                                                                            <ExpandMoreIcon  />
+                                                                                        }
+                                                                                    </IconButton>
+                                                                            </Grid.Column>
                                                                         </Grid.Row>
                                                                     </Grid>
-                                                                </Grid.Column>
-                                                            </Grid.Row>
-                                                        </Grid>
-                                                    </div>
-                                                </Grid.Column>
-                                            </Grid.Row>
-                                        )
-                                    })}
+                                                                </div>
+                                                            </Grid.Column>
+                                                        </Grid.Row>
+                                                        {(this.state.activeIndex === index)?
+                                                                <Grid.Row>
+                                                                    <Grid.Column verticalAlign={"middle"} textAlign={"center"} style={{marginLeft: "15px"}}>
+                                                                        {(this.state.fileData[name])? <span>{this.state.fileData[name]}</span> : null}
+                                                                    </Grid.Column>
+                                                                </Grid.Row>
+                                                            :
+                                                            null
+                                                        }
+                                                    </Grid>
+                                                )
+                                            })}
                                     </Grid>
                                 <br/>
                                 <br/>
