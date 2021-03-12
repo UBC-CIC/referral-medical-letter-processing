@@ -124,6 +124,11 @@ def find_nth(haystack, needle, n):
         n -= 1
     return start
 
+def delete_file(bucket, objectName):
+    client = boto3.client('s3')
+    client.delete_object(Bucket=bucket, Key=objectName)
+    logger.info(f'Deleted {objectName} from S3 bucket {bucket}')
+
 # Added code for summary response
 def process_file(text, ID):
 
@@ -249,6 +254,7 @@ def handler(event, context):
         logger.info(summary)
         output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
         insert_into_s3(summary, bucket, output_key)
+        delete_file(bucket, "protected/"+amplify_user+"/"+key)
         table.update_item(
             Key={'id': key},
             UpdateExpression='set #status = :status',
