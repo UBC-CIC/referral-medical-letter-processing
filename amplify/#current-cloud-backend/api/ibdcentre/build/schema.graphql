@@ -1,6 +1,7 @@
 type Status @aws_iam @aws_cognito_user_pools {
   id: ID!
   patientID: String!
+  date: String
   status: String
   errorMessage: String
   createdAt: AWSDateTime!
@@ -94,6 +95,7 @@ input ModelSizeInput {
 input ModelStatusFilterInput {
   id: ModelIDInput
   patientID: ModelStringInput
+  date: ModelStringInput
   status: ModelStringInput
   errorMessage: ModelStringInput
   and: [ModelStatusFilterInput]
@@ -122,6 +124,7 @@ type Query {
 input CreateStatusInput {
   id: ID
   patientID: String!
+  date: String
   status: String
   errorMessage: String
 }
@@ -129,6 +132,7 @@ input CreateStatusInput {
 input UpdateStatusInput {
   id: ID!
   patientID: String
+  date: String
   status: String
   errorMessage: String
 }
@@ -145,6 +149,7 @@ type Mutation {
 
 input ModelStatusConditionInput {
   patientID: ModelStringInput
+  date: ModelStringInput
   status: ModelStringInput
   errorMessage: ModelStringInput
   and: [ModelStatusConditionInput]
