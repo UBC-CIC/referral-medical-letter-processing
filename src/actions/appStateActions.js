@@ -1,6 +1,6 @@
 import { API, graphqlOperation } from 'aws-amplify';
 import {createStatus, updateStatus} from "../graphql/mutations";
-import { getStatus } from '../graphql/queries';
+import { getStatus, listStatuss } from '../graphql/queries';
 
 
 
@@ -49,27 +49,25 @@ export const fetchStatusSuccess = (payload) => {
     }
 }
 
-//===================================================---LOCAL STATE ACTIONS---==========================================================
+//======================================================---FETCH ALL Items---=================================================================
 
-// Sets processingFinished flag
-export const processingFinished = () => {
-    return {
-        type: "PROCESSING_FINISHED",
+
+// Fetch all items
+export const fetchAllItems = (payload) => {
+    return (dispatch) => {
+        API.graphql(graphqlOperation(listStatuss)).then((response) => {
+            const items = response.data.listStatuss;
+            console.log("items", items);
+            //dispatch(fetchItemsSuccess(status));
+        }).catch((err) => {
+            console.log("Error fetching items: ", err);
+        })
     }
 }
 
-// Sets processingFinished flag
-export const clearProcessingState = () => {
-    return {
-        type: "CLEAR_PROCESSING_STATE",
+// Respond to success condition
+export const fetchItemsSuccess = (payload) => {
+    return (dispatch) => {
+        dispatch({ type: "FETCH_STATUS_SUCCESS", payload});
     }
 }
-
-// Sets processingInitiated flag
-export const initiateProcessing = () => {
-    return {
-        type: "PROCESSING_INITIATED",
-    }
-}
-
-//====================================================================================================================================

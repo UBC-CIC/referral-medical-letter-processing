@@ -123,7 +123,7 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-          "name" : "expirationTime",
+          "name" : "patientID",
           "description" : null,
           "args" : [ ],
           "type" : {
@@ -131,7 +131,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "SCALAR",
-              "name" : "Int",
+              "name" : "String",
               "ofType" : null
             }
           },
