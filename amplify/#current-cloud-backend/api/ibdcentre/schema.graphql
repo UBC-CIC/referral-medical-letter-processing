@@ -6,6 +6,7 @@ type Status @model
 ]) {
   id: ID!
   patientID: String!
+  date: String
   status: String
   errorMessage: String
 }
