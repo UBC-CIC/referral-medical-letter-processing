@@ -124,6 +124,11 @@ def find_nth(haystack, needle, n):
         n -= 1
     return start
 
+def delete_file(bucket, objectName):
+    client = boto3.client('s3')
+    client.delete_object(Bucket=bucket, Key=objectName)
+    logger.info(f'Deleted {objectName} from S3 bucket {bucket}')
+
 # Added code for summary response
 def process_file(text, ID):
 
@@ -180,22 +185,22 @@ def process_file(text, ID):
     for entity in entity_text:
         if entity["Score"] >= 0.8:
             # Find instances of (endoscopic?) procedures that have time expressions 
-            if entity["Category"] == "TIME_EXPRESSION" and entity["Type"] == "TIME_TO_TEST_NAME":
-                for attribute in entity["Attributes"]:
-                    if attribute["Category"] == "TEST_TREATMENT_PROCEDURE" and attribute["RelationshipType"] == "OVERLAP":
-                        attributeText = attribute["Text"].lower()
-                        if attributeText in endoscopy:
-                            procedures.append(entity["Text"] + " " + attribute["Text"])
+            if entity["Category"] == "TEST_TREATMENT_PROCEDURE" and entity["Type"] == "PROCEDURE_NAME":
+                procedures.append(entity["Text"].lower())
             # Otherwise find Diagnosis that are in the category of Medical Condition
             if entity["Traits"]:
                 for trait in entity["Traits"]:
                     if trait["Name"] == "DIAGNOSIS" and entity["Category"] == "MEDICAL_CONDITION":
                         medical_condition.append(entity["Text"].lower())
+    
+    procedures = list(dict.fromkeys(procedures))
     medical_condition = list(dict.fromkeys(medical_condition))
     logger.info(medical_condition)
     logger.info(procedures) 
+    
     mySum["Patient ID"] = ID
     mySum["Appointment Date"] = text[19:30]
+    
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
     pattern2 = re.compile(r'\d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d')
@@ -209,12 +214,12 @@ def process_file(text, ID):
             mySum["Past Surgical History"] = pat[2]
     except Exception as e:
         logger.info(e)
-    mySum["Medication instances"] = medication_instances
-    mySum["Medical condition"] = medical_condition
-    #mySum["Endoscopic Procedures"] = procedures
+
+    mySum["Medication Instances"] = medication_instances
+    mySum["Medical Conditions"] = medical_condition
+    mySum["Detected Procedures"] = procedures
 
     return json.dumps(mySum)
-
 
 def handler(event, context):
     logger.info(event)
@@ -249,6 +254,7 @@ def handler(event, context):
         logger.info(summary)
         output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
         insert_into_s3(summary, bucket, output_key)
+        delete_file(bucket, "protected/"+amplify_user+"/"+key)
         table.update_item(
             Key={'id': key},
             UpdateExpression='set #status = :status',
