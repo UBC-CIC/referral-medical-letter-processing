@@ -37,7 +37,7 @@ function Login(props) {
             }
         }
         retrieveUser();
-    }, [loginState])
+    }, [])
 
     function onChange(e) {
         e.persist();
