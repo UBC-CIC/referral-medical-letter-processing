@@ -198,8 +198,9 @@ def process_file(text, ID):
     logger.info(medical_condition)
     logger.info(procedures) 
     
-    mySum["Patient ID"] = ID
-    mySum["Appointment Date"] = text[19:30]
+    mySum["documentCreatedDate"] = str(datetime.datetime.today()).split()[0]
+    mySum["patientId"] = ID
+    mySum["appointmentDate"] = text[19:30]
     
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
@@ -207,17 +208,17 @@ def process_file(text, ID):
     try:
         pat_sum = re.findall(pattern2, text)
         for pat in pat_sum:
-            mySum["Problem History"] = pat[0]
-            mySum["Lifestyle Notes"] = pat[4]
-            mySum["Family History"] = pat[5]
-            mySum["Extra Intestinal Manifestations"] = pat[3]
-            mySum["Past Surgical History"] = pat[2]
+            mySum["problemHistory"] = pat[0]
+            mySum["lifestyleNotes"] = pat[4]
+            mySum["familyHistory"] = pat[5]
+            mySum["extraIntestinalManifestations"] = pat[3]
+            mySum["pastSurgicalHistory"] = pat[2]
     except Exception as e:
         logger.info(e)
 
-    mySum["Medication Instances"] = medication_instances
-    mySum["Medical Conditions"] = medical_condition
-    mySum["Detected Procedures"] = procedures
+    mySum["medicationInstances"] = medication_instances
+    mySum["medicalConditions"] = medical_condition
+    mySum["detectedProcedures"] = procedures
 
     return json.dumps(mySum)
 
