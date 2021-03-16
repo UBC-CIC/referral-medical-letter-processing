@@ -9,7 +9,7 @@ import os
 import glob
 import re
 from datetime import datetime
-
+import uuid
 # setup
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -204,7 +204,7 @@ def process_file(text, ID):
     logger.info(procedures) 
     
     mySum["documentCreatedDate"] = datetime.today().strftime('%Y-%b-%d')
-    #mySum["id"]
+    mySum["id"] = str(uuid.uuid4())
 
     mySum["patientId"] = ID
     mySum["appointmentDate"] = dates[0]
