@@ -8,6 +8,7 @@ import base64
 import os 
 import glob
 import re
+from datetime import datetime
 
 # setup
 logger = logging.getLogger()
@@ -170,6 +171,7 @@ def process_file(text, ID):
     medication_instances = []
     medical_condition = []
     procedures = []
+    dates = []
     
     for entity in rxnorm_text:
         if entity["Score"] >= 0.8:
@@ -183,6 +185,9 @@ def process_file(text, ID):
     # removes duplicate medication name
     medication_instances = list(dict.fromkeys(medication_instances))
     for entity in entity_text:
+        # Using in-range value to get first instance of date in letter    
+        if entity["Type"] == "DATE":
+            dates.append(entity["Text"])        
         if entity["Score"] >= 0.8:
             # Find instances of (endoscopic?) procedures that have time expressions 
             if entity["Category"] == "TEST_TREATMENT_PROCEDURE" and entity["Type"] == "PROCEDURE_NAME":
@@ -198,9 +203,11 @@ def process_file(text, ID):
     logger.info(medical_condition)
     logger.info(procedures) 
     
-    mySum["documentCreatedDate"] = str(datetime.datetime.today()).split()[0]
+    mySum["documentCreatedDate"] = datetime.today().strftime('%Y-%b-%d')
+    #mySum["id"]
+
     mySum["patientId"] = ID
-    mySum["appointmentDate"] = text[19:30]
+    mySum["appointmentDate"] = dates[0]
     
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
