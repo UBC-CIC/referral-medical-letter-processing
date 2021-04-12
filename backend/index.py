@@ -130,56 +130,43 @@ def delete_file(bucket, objectName):
     client.delete_object(Bucket=bucket, Key=objectName)
     logger.info(f'Deleted {objectName} from S3 bucket {bucket}')
 
-# Retrieving data from sentences
-def getDateSentences(text):
-    date_sentences = []
-    sentences = text.split(". ")
-    print(sentences)
-    for sentence in sentences:
-        words = sentence.split()
-        for word in words:
-            if(is_date(word)):
-                date_sentences.append(sentence)
-                break
-    print(date_sentences)
-    return date_sentences
-
-def is_date(string, fuzzy=False):
-    """
-    Return whether the string can be interpreted as a date.
-
-    :param string: str, string to check for date
-    :param fuzzy: bool, ignore unknown tokens in string if True
-    """
-    try: 
-        parse(string, fuzzy=fuzzy)
-        return True
-
-    except ValueError:
-        return False
-
-def process_text(date_sentences):
-    surgery = []
-    for sentence in date_sentences:
-        entity_text = findEntities(sentence)
-        for entity in entity_text:
-            if entity["Category"] == "TIME_EXPRESSION" and entity["Type"] == "TIME_TO_PROCEDURE_NAME":
-                for attribute in entity["Attributes"]:
-                    attributeText = attribute["Text"]
-                    if attribute["Category"] == "TEST_TREATMENT_PROCEDURE" and attribute["RelationshipType"] == "OVERLAP":
-                        surgery.append((entity["Text"] + " " + attributeText).lower())
-    return surgery
-
 # Added code for summary response
-def process_file(text, ID, surgery):
+def process_file(text, ID):
 
     # Comprehend Medical and Comprehend functions and setup
     mySum = {}
 
+    # Using these dictionaries for the summary
+    #medications = {} 
+    #negations = {}
+    #problem_history = []
+    #page_sum = set()
+    #jobIds = []
+    #textract = boto3.client('textract')
+    # Endoscopic Procedures (possibly store this in Django or a DB) and call as a set 
+    endoscopy = {'anoscopy',
+                'arthroscopy',
+                'bronchoscopy',
+                'colonoscopy',
+                'colposcopy',
+                'cystoscopy',
+                'esophagoscopy',
+                'gastroscopy',
+                'laparoscopy',
+                'laryngoscopy',
+                'neuroendoscopy',
+                'proctoscopy',
+                'sigmoidoscopy',
+                'thoracoscopy'}
+    logger.info(f'{text[1:30]}')
+
     # AWS Comprehend Medical
     entity_text = findEntities(text)
     rxnorm_text = findRx(text)
-
+    
+    logger.info(entity_text)
+    logger.info(rxnorm_text)
+    
     # Finding all instances of medication given to patient 
     medication_instances = []
     medical_condition = []
@@ -219,8 +206,7 @@ def process_file(text, ID, surgery):
     mySum["documentCreatedDate"] = datetime.today().strftime('%Y-%b-%d')
     mySum["appointmentDate"] = dates[0]
     mySum["patientId"] = ID
-    mySum["id"] = str(uuid.uuid4())
-
+    mySum["id"] = str(uuid.uuid4())    
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
     pattern2 = re.compile(r'\d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d')
@@ -238,7 +224,6 @@ def process_file(text, ID, surgery):
     mySum["medicationInstances"] = medication_instances
     mySum["medicalConditions"] = medical_condition
     mySum["detectedProcedures"] = procedures
-    mySum["detectedSurgery"] = surgery
 
     return json.dumps(mySum)
 
@@ -271,10 +256,7 @@ def handler(event, context):
             response = getJobResults(jobId)
         logger.info(response)
         text = textExtractHelper(response)
-        sentences = getDateSentences(text)
-        #trying to extract more from list
-        info = process_text(sentences)
-        summary = process_file(text, json_content["patientID"], info)
+        summary = process_file(text, json_content["patientID"])
         logger.info(summary)
         output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
         insert_into_s3(summary, bucket, output_key)
