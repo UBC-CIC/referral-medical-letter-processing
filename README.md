@@ -1,10 +1,16 @@
-# IBD Centre Project
+# IBD Centre
+This prototype was created for IBD Centre's data processing and storage of a summary of patients
+## Stack
 
-This project uses Amplify and React in the frontend with a Lambda function running in the backend. It utilizes AWS Textract for synchronous text detection from PDF files and uses AWS Comprehend Medical's detect entities and find rx morm functions. Then it sends status to a DynamoDB table, stores a processed json summary file into another folder into the S3 bucket using a AWS Lambda and then displays the uploaded files and processed summary in the UI.
+* **Front-end** - ReactJS on NodeJS as the core framework, Amplify for Auth UI component and AWS integration.
+* **Data** - All data is saved in Amazon S3 and DynamoDB for status
+* **Auth** - Cognito user pool within AWS amplify
+* **Data Processing** - Uses AWS Lambda function in the backend to execute Comprehend Medical API to classify information
+ 
+## Architecture
 
-### Frontend Deployment
-
-
+# Frontend Deployment
+To deploy the frontend part of this application please follow:
 1) Fork this repository
 2) In a terminal from the project root directory, enter the following command (accept all defaults):
 ```javascript
@@ -24,11 +30,10 @@ amplify push
 11) From the Amplify console, navigate to __Backend environments__ -> __Storage__ and click on __View in S3__. We will be using this bucket later to connect to the Backend Lambda function. 
 12) Navigate to AWS DynamoDB and find the table that Amplify created. It should start with Status. Copy that for the Backend as well. 
 
-### Backend Deployment
-
+# Backend Deployment
 Deploy the backend application onto AWS Lambda function.
 
-### Build Instructions 
+**Build Instructions:**
 
 This application requires the frontend Amplfy Application to be setup and running on the same account and region. 
 1. Run the `create_lambda.bat` script for Windows machines or `create_lambda.sh` for Linux machines and follow the prompts 
@@ -38,5 +43,9 @@ This application requires the frontend Amplfy Application to be setup and runnin
 3. In the AWS console, navigate to the newly created lambda function
 4. Click on the Add Trigger Option 
 
-### Updates
+# Changelogs
+
+# Updates
 If you make any updates to `index.py`, you must run `lambda.sh` on a machine with the same OS as Python3.8 in AWS Lambda
+
+# License 
