@@ -7,7 +7,8 @@ This prototype was created for IBD Centre's data processing and storage of a sum
 * **Auth** - Cognito user pool within AWS amplify
 * **Data Processing** - Uses AWS Lambda function in the backend to execute Comprehend Medical API to classify information
  
-## Architecture
+## Architecture Diagram
+![alt text](./docs/IBD.png)
 
 # Frontend Deployment
 To deploy the frontend part of this application please follow:
