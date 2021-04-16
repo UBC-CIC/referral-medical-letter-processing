@@ -14,7 +14,6 @@ import uuid
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-DYNAMOTABLE= os.getenv('DYNAMO_TABLE_NAME')
 comprehend_medical = boto3.client('comprehendmedical')
 comprehend = boto3.client('comprehend')
 
@@ -136,30 +135,6 @@ def process_file(text, ID):
     # Comprehend Medical and Comprehend functions and setup
     mySum = {}
 
-    # Using these dictionaries for the summary
-    #medications = {} 
-    #negations = {}
-    #problem_history = []
-    #page_sum = set()
-    #jobIds = []
-    #textract = boto3.client('textract')
-    # Endoscopic Procedures (possibly store this in Django or a DB) and call as a set 
-    endoscopy = {'anoscopy',
-                'arthroscopy',
-                'bronchoscopy',
-                'colonoscopy',
-                'colposcopy',
-                'cystoscopy',
-                'esophagoscopy',
-                'gastroscopy',
-                'laparoscopy',
-                'laryngoscopy',
-                'neuroendoscopy',
-                'proctoscopy',
-                'sigmoidoscopy',
-                'thoracoscopy'}
-    logger.info(f'{text[1:30]}')
-
     # AWS Comprehend Medical
     entity_text = findEntities(text)
     rxnorm_text = findRx(text)
@@ -209,18 +184,22 @@ def process_file(text, ID):
     mySum["id"] = str(uuid.uuid4())    
     # Attempting to seach groups using RegEx
     #pattern1 = re.compile(r'\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)(.*?)\d\)')
-    pattern2 = re.compile(r'\d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d')
-    try:
-        pat_sum = re.findall(pattern2, text)
+    pat_sum = re.findall(r'\d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d\) (.*?) \d', text)
+    if pat_sum:
         for pat in pat_sum:
             mySum["problemHistory"] = pat[0]
             mySum["lifestyleNotes"] = pat[4]
             mySum["familyHistory"] = pat[5]
             mySum["extraIntestinalManifestations"] = pat[3]
             mySum["pastSurgicalHistory"] = pat[2]
-    except Exception as e:
-        logger.info(e)
-
+    else:
+        flag = False 
+        mySum["problemHistory"] = []
+        mySum["lifestyleNotes"] = []
+        mySum["familyHistory"] = []
+        mySum["extraIntestinalManifestations"] = []
+        mySum["pastSurgicalHistory"] = []
+    logger.info(flag)
     mySum["medicationInstances"] = medication_instances
     mySum["medicalConditions"] = medical_condition
     mySum["detectedProcedures"] = procedures
@@ -244,54 +223,16 @@ def handler(event, context):
     # Get contents of JSON  
     key = json_content["key"]
     logger.info(f'Key for file is {key}')
-    
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(DYNAMOTABLE)
 
-    try:
-        #get_s3_object(bucket, "protected/"+amplify_user+"/"+key, file_path)
-        jobId = startJob(bucket, "protected/"+amplify_user+"/"+key)
-        logger.info(f'Started job with id: {jobId}')
-        if(isJobComplete(jobId) == "SUCCEEDED"):
-            response = getJobResults(jobId)
-        logger.info(response)
-        text = textExtractHelper(response)
-        summary = process_file(text, json_content["patientID"])
-        logger.info(summary)
-        output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
-        insert_into_s3(summary, bucket, output_key)
-        delete_file(bucket, "protected/"+amplify_user+"/"+key)
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status',
-            ExpressionAttributeNames={'#status': 'status'},
-            ExpressionAttributeValues={':status': 'Success'}
-        )
-        return {'result' : "Success", 'Output' : output_key} 
-    except IndexError: 
-        logger.info("Index Error")
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status, #err = :err',
-            ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
-            ExpressionAttributeValues={':status': 'Error', ':err': 'Page out of range'}
-        )
-        return {'result': 'Error'}
-    except (botocore.exceptions.ClientError, botocore.exceptions.ParamValidationError):
-        logger.info("Botocore error")
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status, #err = :err',
-            ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
-            ExpressionAttributeValues={':status': 'Error', ':err': 'AWS Botocore Error'}
-        )
-        return {'result': 'Error'}
-    except Exception as e: 
-        logger.error(e)
-        table.update_item(
-            Key={'id': key},
-            UpdateExpression='set #status = :status, #err = :err',
-            ExpressionAttributeNames={'#status': 'status', '#err': 'errorMessage'},
-            ExpressionAttributeValues={':status': 'Error', ':err': 'Could not convert data'}
-        )
-        return {'result': 'Error'}
+    #get_s3_object(bucket, "protected/"+amplify_user+"/"+key, file_path)
+    jobId = startJob(bucket, "protected/"+amplify_user+"/"+key)
+    logger.info(f'Started job with id: {jobId}')
+    if(isJobComplete(jobId) == "SUCCEEDED"):
+        response = getJobResults(jobId)
+    logger.info(response)
+    text = textExtractHelper(response)
+    summary = process_file(text, json_content["patientID"])
+    logger.info(summary)
+    output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
+    insert_into_s3(summary, bucket, output_key)
+    delete_file(bucket, "protected/"+amplify_user+"/"+key)
