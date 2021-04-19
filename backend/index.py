@@ -12,12 +12,15 @@ from datetime import datetime
 import uuid
 from dateutil.parser import parse
 
-# setup
+# setup for error logging and comprehend
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 comprehend_medical = boto3.client('comprehendmedical')
 comprehend = boto3.client('comprehend')
+
+# global variable for pattern
+flag = True
 
 # textract operations
 def startJob(s3BucketName, objectName):
@@ -60,7 +63,6 @@ def getJobResults(jobId):
         nextToken = response['NextToken']
 
     while(nextToken):
-        time.sleep(5)
         response = client.get_document_text_detection(JobId=jobId, NextToken=nextToken)
         pages.append(response)
         logger.info(pages)
