@@ -15,17 +15,17 @@ rm function.zip
 
 # Build poppler
 rm -rf poppler_binaries/
-./build_poppler.sh
+# ./build_poppler.sh
 
 # Make a virtualenv
-python3.8 -m venv env/
-source env/bin/activate
+# python3.8 -m venv env/
+# source env/bin/activate
 
 # Creating the package
 mkdir -p package
 
 # Moving the poppler libraries in the package
-cp -r poppler_binaries/ package/
+# cp -r poppler_binaries/ package/
 
 # Moving the function in the package 
 cp index.py package/

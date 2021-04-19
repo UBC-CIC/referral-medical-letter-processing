@@ -10,6 +10,8 @@ import glob
 import re
 from datetime import datetime
 import uuid
+from dateutil.parser import parse
+
 # setup
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -129,8 +131,37 @@ def delete_file(bucket, objectName):
     client.delete_object(Bucket=bucket, Key=objectName)
     logger.info(f'Deleted {objectName} from S3 bucket {bucket}')
 
+# Retrieving data from sentences
+def getDateSentences(text):
+    date_sentences = []
+    sentences = text.split(". ")
+    print(sentences)
+    for sentence in sentences:
+        words = sentence.split()
+        for word in words:
+            if(is_date(word)):
+                date_sentences.append(sentence)
+                break
+    print(date_sentences)
+    return date_sentences
+
+def is_date(string, fuzzy=False):
+    # https://stackoverflow.com/questions/25341945/check-if-string-has-date-any-format/
+    """
+    Return whether the string can be interpreted as a date.
+
+    :param string: str, string to check for date
+    :param fuzzy: bool, ignore unknown tokens in string if True
+    """
+    try: 
+        parse(string, fuzzy=fuzzy)
+        return True
+
+    except ValueError:
+        return False
+
 # Added code for summary response
-def process_file(text, ID):
+def process_file(text, ID, datedSentences):
 
     # Comprehend Medical and Comprehend functions and setup
     mySum = {}
@@ -193,17 +224,24 @@ def process_file(text, ID):
             mySum["extraIntestinalManifestations"] = pat[3]
             mySum["pastSurgicalHistory"] = pat[2]
     else:
-        flag = False 
+        flag = False
         mySum["problemHistory"] = []
         mySum["lifestyleNotes"] = []
         mySum["familyHistory"] = []
         mySum["extraIntestinalManifestations"] = []
         mySum["pastSurgicalHistory"] = []
     logger.info(flag)
+    # what can i do with this flag? and how can i extract More Accurate info?
+    # more soln:
+    # populate empty list above (if pattern dont exist)
+    # dated sentences + the one which contain (endoscopy) tags can be brought together
+    # accuracy soln:
+    # remove multiple med names
+    # dated medication instances
     mySum["medicationInstances"] = medication_instances
     mySum["medicalConditions"] = medical_condition
     mySum["detectedProcedures"] = procedures
-
+    mySum["datedSentences"] = datedSentences
     return json.dumps(mySum)
 
 def handler(event, context):
@@ -231,8 +269,10 @@ def handler(event, context):
         response = getJobResults(jobId)
     logger.info(response)
     text = textExtractHelper(response)
-    summary = process_file(text, json_content["patientID"])
+    datedSentences = getDateSentences(text)
+    summary = process_file(text, json_content["patientID"], datedSentences)
     logger.info(summary)
+    logger.info(datedSentences)
     output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
     insert_into_s3(summary, bucket, output_key)
     delete_file(bucket, "protected/"+amplify_user+"/"+key)
