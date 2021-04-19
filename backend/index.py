@@ -233,13 +233,7 @@ def process_file(text, ID, datedSentences):
         mySum["extraIntestinalManifestations"] = []
         mySum["pastSurgicalHistory"] = []
     logger.info(flag)
-    # what can i do with this flag? and how can i extract More Accurate info?
-    # more soln:
-    # populate empty list above (if pattern dont exist)
-    # dated sentences + the one which contain (endoscopy) tags can be brought together
-    # accuracy soln:
-    # remove multiple med names
-    # dated medication instances
+
     mySum["medicationInstances"] = medication_instances
     mySum["medicalConditions"] = medical_condition
     mySum["detectedProcedures"] = procedures
