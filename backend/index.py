@@ -20,7 +20,7 @@ comprehend_medical = boto3.client('comprehendmedical')
 comprehend = boto3.client('comprehend')
 
 # global variable for pattern
-flag = True
+# flag = True
 
 # textract operations
 def startJob(s3BucketName, objectName):
@@ -226,13 +226,12 @@ def process_file(text, ID, datedSentences):
             mySum["extraIntestinalManifestations"] = pat[3]
             mySum["pastSurgicalHistory"] = pat[2]
     else:
-        flag = False
+        # flag = False
         mySum["problemHistory"] = []
         mySum["lifestyleNotes"] = []
         mySum["familyHistory"] = []
         mySum["extraIntestinalManifestations"] = []
         mySum["pastSurgicalHistory"] = []
-    logger.info(flag)
 
     mySum["medicationInstances"] = medication_instances
     mySum["medicalConditions"] = medical_condition
