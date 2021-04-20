@@ -227,11 +227,11 @@ def process_file(text, ID, datedSentences):
             mySum["pastSurgicalHistory"] = pat[2]
     else:
         # flag = False
-        mySum["problemHistory"] = []
-        mySum["lifestyleNotes"] = []
-        mySum["familyHistory"] = []
-        mySum["extraIntestinalManifestations"] = []
-        mySum["pastSurgicalHistory"] = []
+        mySum["problemHistory"] = "[]"
+        mySum["lifestyleNotes"] = "[]"
+        mySum["familyHistory"] = "[]"
+        mySum["extraIntestinalManifestations"] = "[]"
+        mySum["pastSurgicalHistory"] = "[]"
 
     mySum["medicationInstances"] = medication_instances
     mySum["medicalConditions"] = medical_condition
