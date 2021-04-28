@@ -11,6 +11,8 @@ This prototype was created for IBD Centre's data processing and storage of a sum
 ![alt text](./docs/IBD.png)
 
 # Frontend Deployment
+![Deploy with Amplify](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/UBC-CIC/ibd-centre)
+
 To deploy the frontend part of this application please follow:
 1) Fork this repository
 2) In a terminal from the project root directory, enter the following command (accept all defaults):

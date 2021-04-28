@@ -209,7 +209,7 @@ class S3Table extends Component {
                                             <div className={"list-header"} >
                                                 <Grid>
                                                     <Grid.Row columns={5} style={{paddingTop: "10px", paddingBottom: "10px", paddingLeft: "0px", marginLeft: "20px", marginRight: "20px", paddingRight: "0px"}}>
-                                                        <Grid.Column width={4} textAlign={"left"} verticalAlign={"middle"}>
+                                                        <Grid.Column width={5} textAlign={"left"} verticalAlign={"middle"}>
                                                             <span className={"list-header-title"}>Source File</span>
                                                         </Grid.Column>
                                                         <Grid.Column width={4} textAlign={"left"} verticalAlign={"middle"}>
