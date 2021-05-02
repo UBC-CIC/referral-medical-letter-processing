@@ -3,14 +3,14 @@
 
 const awsmobile = {
     "aws_project_region": "ca-central-1",
-    "aws_cognito_identity_pool_id": "ca-central-1:772ddc37-7614-413b-a7a7-a8389e320cd0",
+    "aws_cognito_identity_pool_id": "ca-central-1:2b381a6f-babc-4d8e-a9c5-f6850d5deab3",
     "aws_cognito_region": "ca-central-1",
-    "aws_user_pools_id": "ca-central-1_DqL1zruS5",
-    "aws_user_pools_web_client_id": "44vp1i0c3mbilsqafnsfem0iva",
+    "aws_user_pools_id": "ca-central-1_9sdwvbvbH",
+    "aws_user_pools_web_client_id": "jbacuq66t0poekpeshdglqvpl",
     "oauth": {},
-    "aws_user_files_s3_bucket": "ibdcentreb3cbdd9c0c2a495498c88bf5c73a4aea221621-dev",
+    "aws_user_files_s3_bucket": "ibdcentreb3cbdd9c0c2a495498c88bf5c73a4aea225552-devw",
     "aws_user_files_s3_bucket_region": "ca-central-1",
-    "aws_appsync_graphqlEndpoint": "https://4dctb7zw75c7zptpb3ftoegpma.appsync-api.ca-central-1.amazonaws.com/graphql",
+    "aws_appsync_graphqlEndpoint": "https://mxpcwollzjbmdmmmoc7tfjmyha.appsync-api.ca-central-1.amazonaws.com/graphql",
     "aws_appsync_region": "ca-central-1",
     "aws_appsync_authenticationType": "AMAZON_COGNITO_USER_POOLS"
 };
