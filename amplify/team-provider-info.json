@@ -16,5 +16,23 @@
         "ibdcentre98a4cd1a": {}
       }
     }
+  },
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ibdcentre-dev-141302-authRole",
+      "UnauthRoleArn": "arn:aws:iam::252341934707:role/amplify-ibdcentre-dev-141302-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::252341934707:role/amplify-ibdcentre-dev-141302-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-ibdcentre-dev-141302-deployment",
+      "UnauthRoleName": "amplify-ibdcentre-dev-141302-unauthRole",
+      "StackName": "amplify-ibdcentre-dev-141302",
+      "StackId": "arn:aws:cloudformation:ca-central-1:252341934707:stack/amplify-ibdcentre-dev-141302/750515f0-ac54-11eb-9888-0eab779fa6d6",
+      "AmplifyAppId": "d2w9zxx84mhoyf"
+    },
+    "categories": {
+      "auth": {
+        "ibdcentre98a4cd1a": {}
+      }
+    }
   }
 }
