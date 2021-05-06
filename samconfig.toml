@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "ibd-sam"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1bq98xev98dmn"
+s3_prefix = "ibd-sam"
+region = "ca-central-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM"
+parameter_overrides = "s3Bucket=\"ibdcentreb3cbdd9c0c2a495498c88bf5c73a4aea171054-devq\" DynamoDbTable=\"Status-k62wpbse7vblzlwf2zwssrzsnq-devq\""
