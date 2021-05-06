@@ -2,7 +2,7 @@
   "providers": [
     "awscloudformation"
   ],
-  "projectName": "ibdcentre",
+  "projectName": "ibd-centre",
   "version": "3.0",
   "frontend": "javascript",
   "javascript": {

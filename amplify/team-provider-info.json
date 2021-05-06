@@ -1,4 +1,22 @@
 {
+  "devp": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ibdcentre-devp-225227-authRole",
+      "UnauthRoleArn": "arn:aws:iam::252341934707:role/amplify-ibdcentre-devp-225227-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::252341934707:role/amplify-ibdcentre-devp-225227-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-ibdcentre-devp-225227-deployment",
+      "UnauthRoleName": "amplify-ibdcentre-devp-225227-unauthRole",
+      "StackName": "amplify-ibdcentre-devp-225227",
+      "StackId": "arn:aws:cloudformation:ca-central-1:252341934707:stack/amplify-ibdcentre-devp-225227/90ec41c0-adf4-11eb-b4bd-02d9e060143a",
+      "AmplifyAppId": "d2lwj3m3i5ccf5"
+    },
+    "categories": {
+      "auth": {
+        "ibdcentre98a4cd1a": {}
+      }
+    }
+  },
   "devw": {
     "awscloudformation": {
       "AuthRoleName": "amplify-ibdcentre-devw-225552-authRole",
@@ -45,7 +63,7 @@
       "UnauthRoleName": "amplify-ibdcentre-devq-171054-unauthRole",
       "StackName": "amplify-ibdcentre-devq-171054",
       "StackId": "arn:aws:cloudformation:ca-central-1:591356733838:stack/amplify-ibdcentre-devq-171054/8af79840-adff-11eb-b4bd-02d9e060143a",
-      "AmplifyAppId": "d3jf4a20q2rf2m"
+      "AmplifyAppId": "d2lwj3m3i5ccf5"
     },
     "categories": {
       "auth": {

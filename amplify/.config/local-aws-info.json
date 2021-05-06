@@ -1,17 +1,7 @@
 {
-  "devw": {
-    "configLevel": "project",
-    "useProfile": true,
-    "profileName": "AmplifyProfile"
-  },
-  "dev": {
+  "devp": {
     "configLevel": "project",
     "useProfile": true,
     "profileName": "IbdProfile"
-  },
-  "devq": {
-    "configLevel": "project",
-    "useProfile": true,
-    "profileName": "AmplifyProfile"
   }
 }
