@@ -52,23 +52,5 @@
         "ibdcentre98a4cd1a": {}
       }
     }
-  },
-  "devq": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-ibdcentre-devq-171054-authRole",
-      "UnauthRoleArn": "arn:aws:iam::591356733838:role/amplify-ibdcentre-devq-171054-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::591356733838:role/amplify-ibdcentre-devq-171054-authRole",
-      "Region": "ca-central-1",
-      "DeploymentBucketName": "amplify-ibdcentre-devq-171054-deployment",
-      "UnauthRoleName": "amplify-ibdcentre-devq-171054-unauthRole",
-      "StackName": "amplify-ibdcentre-devq-171054",
-      "StackId": "arn:aws:cloudformation:ca-central-1:591356733838:stack/amplify-ibdcentre-devq-171054/8af79840-adff-11eb-b4bd-02d9e060143a",
-      "AmplifyAppId": "d2lwj3m3i5ccf5"
-    },
-    "categories": {
-      "auth": {
-        "ibdcentre98a4cd1a": {}
-      }
-    }
   }
 }
