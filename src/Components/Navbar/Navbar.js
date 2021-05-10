@@ -5,7 +5,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import { Auth } from "aws-amplify";
 import { connect } from "react-redux";
-import {updateLoginState} from "../../Actions/loginActions";
+import {updateLoginState} from "../../actions/loginActions";
 import "./Navbar.css";
 
 
