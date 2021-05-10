@@ -1,46 +1,43 @@
-#!/bin/bash
+echo "Enter your AWS account ID"
+read ACCT_ID
+echo "Enter name for Lambda function"
+read LAMBDA_NAME
+echo "Enter name for DynamoDB table"
+read DYNAMO_NAME
+echo "Enter AWS region"
+read REGION
 
-if [[ ! -f "./amplify/.config/project-config.json" ]]; then
-    echo 'Project file does not exist'
-    exit 1
-fi
+aws lambda delete-function --function-name $LAMBDA_NAME --region $REGION
 
-PROJECT_NAME=$(cat ./amplify/.config/project-config.json | jq -r '.projectName')
-if [ -z "$PROJECT_NAME" ]; then
-    echo 'Unable to find PROJECT NAME'
-    exit 1
-fi
-echo "Project Name: ${PROJECT_NAME}"
-S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
-if [ -z "$S3_BUCKET" ]; then
-    echo 'Unable to find S3 BUCKET'
-    exit 1
-fi
-echo "Bucket Name: ${S3_BUCKET}"
-DYNAMO_TABLE=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters dynamodb --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | cut -f2- -d/)
-if [ -z "$DYNAMO_TABLE" ]; then
-    echo 'Unable to find DYNAMO TABLE'
-    exit 1
-fi
-echo "DynamoDb Table: ${DYNAMO_TABLE}"
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/AWSLambdaFullAccess --role-name ibd-lambda-role
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonTextractFullAccess --role-name ibd-lambda-role
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --role-name ibd-lambda-role
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess --role-name ibd-lambda-role
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendFullAccess --role-name ibd-lambda-role
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAccess --role-name ibd-lambda-role
+aws iam detach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendMedicalFullAccess --role-name ibd-lambda-role
+aws iam delete-role --role-name ibd-lambda-role
 
-echo "Creating Lambda Package"
+aws iam create-role --role-name ibd-lambda-role --assume-role-policy-document file://role-policy.json
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AWSLambdaFullAccess --role-name ibd-lambda-role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonTextractFullAccess --role-name ibd-lambda-role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --role-name ibd-lambda-role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess --role-name ibd-lambda-role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendFullAccess --role-name ibd-lambda-role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAccess --role-name ibd-lambda-role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/ComprehendMedicalFullAccess --role-name ibd-lambda-role
 
-./create_package.sh
+sleep 5
 
-sam package --s3-bucket ${S3_BUCKET} --output-template-file out.yaml
-sam deploy --template-file out.yaml --capabilities CAPABILITY_IAM --stack-name "${PROJECT_NAME}Lambda" --parameter-overrides ParameterKey=s3Bucket,ParameterValue="${S3_BUCKET}" ParameterKey=DynamoDbTable,ParameterValue="${DYNAMO_TABLE}"
-
-rm package.zip
-
-LAMBDA_ARN=$(aws cloudformation describe-stacks --stack-name "${PROJECT_NAME}Lambda" --query "Stacks[0].Outputs[?OutputKey=='PdfToCsvArn'].OutputValue" --output text)
-if [ -z "$LAMBDA_ARN" ]; then
-    echo 'Unable to find LAMBDA ARN'
-    exit 1
-fi
-echo "Lambda: ${LAMBDA_ARN}"
-
-sed "s|%LambdaArn%|$LAMBDA_ARN|g" notification.json > notification.s3
-aws s3api put-bucket-notification-configuration --bucket "${S3_BUCKET}" --notification-configuration file://notification.s3 --output text
-
-
+# Create Lambda Function
+aws lambda create-function --function-name $LAMBDA_NAME \
+                        --runtime python3.8 \
+                        --memory 768 \
+                        --handler index.handler \
+                        --description "Convert PDF to Json summary" \
+                        --timeout 150 \
+                        --region $REGION \
+                        --environment Variables={DYNAMO_TABLE_NAME=$DYNAMO_NAME} \
+                        --role arn:aws:iam::$ACCT_ID:role/ibd-lambda-role \
+                        --publish \
+                        --zip-file fileb://function.zip

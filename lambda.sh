@@ -5,27 +5,15 @@
 # Assumption: Uses the same environment as Python3.8 found in AWS Lambda 
 # See https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html for more information on the environment to use  
 
-echo "Please enter lambda function to update"
+echo "Please enter lambda function to update (hint: PdfToJson might be suitable)"
 read LAMBDA_NAME
 
 # Clean up before starting
-rm -rf env/
 rm -rf package/
 rm function.zip
 
-# Build poppler
-rm -rf poppler_binaries/
-# ./build_poppler.sh
-
-# Make a virtualenv
-# python3.8 -m venv env/
-# source env/bin/activate
-
 # Creating the package
 mkdir -p package
-
-# Moving the poppler libraries in the package
-# cp -r poppler_binaries/ package/
 
 # Moving the function in the package 
 cp index.py package/
