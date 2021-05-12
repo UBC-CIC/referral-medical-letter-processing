@@ -5,7 +5,7 @@ This prototype was created for IBD Centre's data processing and storage of a sum
 * **Front-end** - ReactJS on NodeJS as the core framework, Amplify for Auth UI component and AWS integration.
 * **Data** - All data is saved in Amazon S3 and DynamoDB for status
 * **Auth** - Cognito user pool within AWS amplify
-* **Data Processing** - Uses AWS Lambda function in the backend to execute Comprehend Medical API to classify information
+* **Data Processing** - Uses a Lambda function in the backend to execute Comprehend Medical API and Regex pattern to detect and categorize information 
  
 ## Architecture Diagram
 ![alt text](./docs/IBD.png)
@@ -18,26 +18,23 @@ Before you deploy, you must have the following installed:
 *  [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) 
 *  [Amplify CLI installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart) 
 
-# Frontend Deployment
+## Deployment
+First you will need to clone and fork this repository. The overall deployment has 3 parts, frontend, backend and setting up Glue and Athena.
+### Frontend Deployment
 [![Deploy with Amplify](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/UBC-CIC/ibd-centre)
 
-# Backend Deployment
-Deploy the backend application onto AWS Lambda function.
+This application requires the frontend Amplfy Application to be setup and running on the same account and region (ca-central-1). Addiitionally make sur
 
-**Build Instructions:**
+### Backend Deployment
+Deploying the backend application onto your AWS account requires the following steps:
 
-This application requires the frontend Amplfy Application to be setup and running on the same account and region. 
-1. Run the `create_lambda.bat` script for Windows machines or `create_lambda.sh` for Linux machines and follow the prompts 
-2. The AWS Account ID can be found in the Account Settings in the Console. 
-3. The DynamoDB table name can be found by searching DynamoDB and clicking on __Tables__. The corresponding table should start with _Status_. 
-4. The region should be the same as the region you used to create the Amplify Application ie. ca-central-1. 
-3. In the AWS console, navigate to the newly created lambda function
-4. Click on the Add Trigger Option 
-5. Add a S3 create object trigger associated to the S3 bucket that Amplify created in the Frontend Deployment
+1. Run `deploy_lambda.sh` for AWS SAM to package and deploy resources into your account. 
+2. Confirm that the names are correct for project name, s3 bucket, dynamodb, and the lambda arn.
+3. Click yes to all options.
+4. On your AWS console in Amplify, once frontend deployment is successful, you can now login, make an account and upload/process the letters.
 
-# Changelogs
+### Glue and Athena set up
 
-# Updates
-If you make any updates to `index.py`, you must run `lambda.sh` on a machine with the same OS as Python3.8 in AWS Lambda
+## Changelogs
 
-# License 
+## License 

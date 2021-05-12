@@ -2,9 +2,9 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "ibd-sam-test"
+stack_name = "ibd-test"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-cenpt968dvxb"
-s3_prefix = "ibd-sam-test"
+s3_prefix = "ibd-test"
 region = "ca-central-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM"

@@ -11,33 +11,29 @@ if [ -z "$PROJECT_NAME" ]; then
     exit 1
 fi
 echo "Project Name: ${PROJECT_NAME}"
-S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
+
+S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="ibdcentre" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
 if [ -z "$S3_BUCKET" ]; then
     echo 'Unable to find S3 BUCKET'
     exit 1
 fi
 echo "Bucket Name: ${S3_BUCKET}"
-DYNAMO_TABLE=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters dynamodb --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | cut -f2- -d/)
+
+DYNAMO_TABLE=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="ibdcentre" --resource-type-filters dynamodb --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | cut -f2- -d/)
 if [ -z "$DYNAMO_TABLE" ]; then
     echo 'Unable to find DYNAMO TABLE'
     exit 1
 fi
 echo "DynamoDb Table: ${DYNAMO_TABLE}"
 
-echo "running sam setup for lambda deployment"
+sam package --s3-bucket ${S3_BUCKET} --output-template-file out.yaml
+sam deploy --template-file out.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --stack-name ibd-lambda --parameter-overrides ParameterKey=s3Bucket,ParameterValue="${S3_BUCKET}" ParameterKey=DynamoDbTable,ParameterValue="${DYNAMO_TABLE}"
 
-sam deploy -g --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM
+LAMBDAARN=$(aws ssm get-parameter --name "/ibd/lambdaArn" --query Parameter.Value --output text)
+echo "Lambda: ${LAMBDAARN}"
 
-# sam package --s3-bucket ${S3_BUCKET} --output-template-file out.yaml
-# sam deploy --template-file out.yaml --capabilities CAPABILITY_IAM --stack-name "${PROJECT_NAME}Lambda" --parameter-overrides ParameterKey=s3Bucket,ParameterValue="${S3_BUCKET}" ParameterKey=DynamoDbTable,ParameterValue="${DYNAMO_TABLE}"
+sed "s|%LambdaArn%|$LAMBDAARN|g" notification.json > notification.s3
+aws s3api put-bucket-notification-configuration --bucket "${S3_BUCKET}" --notification-configuration file://notification.s3 --output text
 
-LAMBDA_ARN=$(aws cloudformation describe-stacks --stack-name "${PROJECT_NAME}Lambda" --query "Stacks[0].Outputs[?OutputKey=='PdfToCsvArn'].OutputValue" --output text)
-if [ -z "$LAMBDA_ARN" ]; then
-    echo 'Unable to find LAMBDA ARN'
-    exit 1
-fi
-echo "Lambda: ${LAMBDA_ARN}"
-
-#sed "s|%LambdaArn%|$LAMBDA_ARN|g" notification.json > notification.s3
-#aws s3api put-bucket-notification-configuration --bucket "${S3_BUCKET}" --notification-configuration file://notification.s3 --output text
-
+rm notification.s3
+rm out.yaml
