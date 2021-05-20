@@ -35,6 +35,8 @@ Deploying the backend application onto your AWS account requires the following s
 
 ### Glue and Athena set up
 
+1. Run `setup_athena.sh`
+
 ## Changelogs
 
 ## License 
