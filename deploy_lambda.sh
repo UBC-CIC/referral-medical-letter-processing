@@ -12,14 +12,14 @@ if [ -z "$PROJECT_NAME" ]; then
 fi
 echo "Project Name: ${PROJECT_NAME}"
 
-S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="ibdcentre" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
+S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="ibdcentre" --resource-type-filters s3 --query 'ResourceTagMappingList[0].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
 if [ -z "$S3_BUCKET" ]; then
     echo 'Unable to find S3 BUCKET'
     exit 1
 fi
 echo "Bucket Name: ${S3_BUCKET}"
 
-DYNAMO_TABLE=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="ibdcentre" --resource-type-filters dynamodb --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | cut -f2- -d/)
+DYNAMO_TABLE=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="ibdcentre" --resource-type-filters dynamodb --query 'ResourceTagMappingList[0].[ResourceARN]' --output text | cut -f2- -d/)
 if [ -z "$DYNAMO_TABLE" ]; then
     echo 'Unable to find DYNAMO TABLE'
     exit 1
@@ -34,6 +34,3 @@ echo "Lambda: ${LAMBDAARN}"
 
 sed "s|%LambdaArn%|$LAMBDAARN|g" notification.json > notification.s3
 aws s3api put-bucket-notification-configuration --bucket "${S3_BUCKET}" --notification-configuration file://notification.s3 --output text
-
-rm notification.s3
-rm out.yaml

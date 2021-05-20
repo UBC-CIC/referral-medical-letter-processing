@@ -269,7 +269,7 @@ def handler(event, context):
     logger.info(summary)
     logger.info(datedSentences)
     output_key = 'protected/'+ amplify_user + '/json/' + json_content["keyName"] + '.json'
-    output_athena = 'athena-test/' + json_content["keyName"] + '.json'
+    output_athena = 'ibd-records/' + json_content["keyName"] + '.json'
     insert_into_s3(summary, bucket, output_athena)
     insert_into_s3(summary, bucket, output_key)
     delete_file(bucket, "protected/"+amplify_user+"/"+key)
