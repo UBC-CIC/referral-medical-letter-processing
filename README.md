@@ -38,7 +38,8 @@ Deploying the backend application onto your AWS account requires the following s
 
 ### Glue and Athena set up
 
-1. Run `setup_athena.sh`
+1. Run `setup_athena.sh`, it will ask you for bucket name again and you can paste the same one. 
+2. Go to your aws account management console, search for Athena to find the newly made tables.
 
 ## Changelogs
 
