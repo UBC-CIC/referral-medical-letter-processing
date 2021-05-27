@@ -30,8 +30,7 @@ Make sure to add the role and then click save and deploy.
 ### Backend Deployment
 Deploying the backend application onto your AWS account requires the following steps:
 
-1. Run `bucket.sh` and `dynamo.sh` and check if the selected the bucket that amplify project just made (you can check this in the console). If it's not, copy it for next steps.
-2. Then run `deploy_lambda.sh`, enter the bucket and dynamodb table previously found, and wait for sam to deploy
+1. Run `deploy_lambda.sh`, confirm the bucket and dynamodb name and then wait for sam to deploy.
 2. Confirm that the names are correct for project name, s3 bucket, dynamodb, and the lambda arn.
 3. Click yes to options that pop up.
 4. On your AWS console in Amplify, once frontend deployment is successful, you can now login, make an account and upload/process the letters.

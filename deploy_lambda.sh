@@ -10,12 +10,21 @@ if [ -z "$PROJECT_NAME" ]; then
     echo 'Unable to find PROJECT NAME'
     exit 1
 fi
-
 echo "Project Name: ${PROJECT_NAME}"
-echo "Enter Bucket Name: "
-read S3_BUCKET
-echo "Enter DynamoDB table: "
-read DYNAMO_TABLE
+
+S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="ibdcentre" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
+if [ -z "$S3_BUCKET" ]; then
+    echo 'Unable to find S3 BUCKET'
+    exit 1
+fi
+echo "Bucket Name: ${S3_BUCKET}"
+
+DYNAMO_TABLE=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters dynamodb --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | cut -f2- -d/)
+if [ -z "$DYNAMO_TABLE" ]; then
+    echo 'Unable to find DYNAMO TABLE'
+    exit 1
+fi
+echo "DynamoDb Table: ${DYNAMO_TABLE}"
 
 sam package --s3-bucket ${S3_BUCKET} --output-template-file out.yaml
 sam deploy --template-file out.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --stack-name ibd-lambda --parameter-overrides ParameterKey=s3Bucket,ParameterValue="${S3_BUCKET}" ParameterKey=DynamoDbTable,ParameterValue="${DYNAMO_TABLE}"
@@ -23,11 +32,6 @@ sam deploy --template-file out.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUT
 sleep 5
 
 LAMBDAARN=$(aws ssm get-parameter --name "/ibd/lambdaArn" --query Parameter.Value --output text)
-#LAMBDAARN=$(aws cloudformation describe-stacks --stack-name ibd-deploy --query "Stacks[0].Outputs[?OutputKey=='PdfToJsonArn'].OutputValue" --output text)
-#if [ -z "$LAMBDAARN" ]; then
-#    echo 'Unable to find LAMBDA ARN'
-#    exit 1
-#fi
 echo "Lambda: ${LAMBDAARN}"
 
 sed "s|%LambdaArn%|$LAMBDAARN|g" notification.json > notification.s3
