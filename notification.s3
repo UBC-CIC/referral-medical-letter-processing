@@ -2,7 +2,7 @@
     "LambdaFunctionConfigurations": [
         {
             "Id": "LambdaValidation",
-            "LambdaFunctionArn": "arn:aws:lambda:ca-central-1:252341934707:function:ibd-lambda-PdfToJson-1M5ISZLN9FCED",
+            "LambdaFunctionArn": "arn:aws:lambda:ca-central-1:252341934707:function:ibd-lambda-PdfToJson-Bh2v2J6B8Wb2",
             "Events": [
                 "s3:ObjectCreated:*"
             ],

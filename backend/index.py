@@ -237,7 +237,8 @@ def process_file(text, ID, datedSentences):
     mySum["medicalConditions"] = medical_condition
     mySum["detectedProcedures"] = procedures
     mySum["datedSentences"] = datedSentences
-    return json.dumps(mySum)
+    
+    return json.dumps(mySum, indent=2)
 
 def handler(event, context):
     logger.info(event)
