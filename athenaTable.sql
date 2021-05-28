@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE `ibd_records`.`ibd_db`(
+CREATE EXTERNAL TABLE `ibd_records`.`ibd_tables`(
   `documentcreateddate` string COMMENT 'from deserializer', 
   `appointmentdate` string COMMENT 'from deserializer', 
   `patientid` string COMMENT 'from deserializer', 

@@ -1,0 +1,21 @@
+{
+    "LambdaFunctionConfigurations": [
+        {
+            "Id": "LambdaValidation",
+            "LambdaFunctionArn": "arn:aws:lambda:ca-central-1:591356733838:function:ibd-lambda-PdfToJson-KF5CEiUVb82S",
+            "Events": [
+                "s3:ObjectCreated:*"
+            ],
+            "Filter": {
+                "Key": {
+                  "FilterRules": [
+                    {
+                      "Name": "suffix",
+                      "Value": ".json"
+                    }
+                  ]
+                }
+            }
+        }
+    ]
+}
