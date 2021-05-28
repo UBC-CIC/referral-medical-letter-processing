@@ -18,3 +18,5 @@ amplify-build-config.json
 amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
+.DS_Store
+samconfig.toml
