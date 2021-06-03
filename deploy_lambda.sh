@@ -26,8 +26,8 @@ if [ -z "$DYNAMO_TABLE" ]; then
 fi
 echo "DynamoDb Table: ${DYNAMO_TABLE}"
 
-sam package --s3-bucket ${S3_BUCKET} --output-template-file out.yaml
-sam deploy --template-file out.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --stack-name ibd-lambda --parameter-overrides ParameterKey=s3Bucket,ParameterValue="${S3_BUCKET}" ParameterKey=DynamoDbTable,ParameterValue="${DYNAMO_TABLE}"
+sam build && sam package --s3-bucket ${S3_BUCKET} --output-template-file out.yaml
+sam deploy -g --template-file out.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --stack-name ibd-lambda --parameter-overrides ParameterKey=s3Bucket,ParameterValue="${S3_BUCKET}" ParameterKey=DynamoDbTable,ParameterValue="${DYNAMO_TABLE}"
 
 sleep 5
 
