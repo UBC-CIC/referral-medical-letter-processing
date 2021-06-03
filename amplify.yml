@@ -1,0 +1,31 @@
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - '# Execute Amplify CLI with the helper script'
+        - amplifyPush --simple
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - yum install -y jq
+        - export AWSREGION=$(aws configure get region)
+        - aws ssm put-parameter --name "/ibd/region" --type String --value "${AWSREGION}" --overwrite
+        - export PROJECT_NAME=$(cat ./amplify/.config/project-config.json | jq -r '.projectName')
+        - aws ssm put-parameter --name "/ibd/projectName" --type String --value "${PROJECT_NAME}" --overwrite
+        - export S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
+        - aws ssm put-parameter --name "/ibd/s3Bucket" --type String --value "${S3_BUCKET}" --overwrite
+        - export DYNAMO_TABLE=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters dynamodb --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | cut -f2- -d/)
+        - aws ssm put-parameter --name "/ibd/dynamodb" --type String --value "${DYNAMO_TABLE}" --overwrite
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
