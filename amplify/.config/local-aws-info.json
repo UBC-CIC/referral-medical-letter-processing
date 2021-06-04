@@ -3,5 +3,15 @@
     "configLevel": "project",
     "useProfile": true,
     "profileName": "IbdProfile"
+  },
+  "dev": {
+    "configLevel": "project",
+    "useProfile": true,
+    "profileName": "AmplifyProfile"
+  },
+  "devb": {
+    "configLevel": "project",
+    "useProfile": true,
+    "profileName": "AmplifyProfile"
   }
 }

@@ -1,0 +1,56 @@
+{
+  "devm": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ibdcentre-devw-225552-authRole",
+      "UnauthRoleArn": "arn:aws:iam::591356733838:role/amplify-ibdcentre-devw-225552-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::591356733838:role/amplify-ibdcentre-devw-225552-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-ibdcentre-devw-225552-deployment",
+      "UnauthRoleName": "amplify-ibdcentre-devw-225552-unauthRole",
+      "StackName": "amplify-ibdcentre-devw-225552",
+      "StackId": "arn:aws:cloudformation:ca-central-1:252341934707:stack/amplify-ibdcentre-devw-225552/e2407580-a874-11eb-9b0c-0ede20069124",
+      "AmplifyAppId": "d3vd7qeie3vpdv"
+    },
+    "categories": {
+      "auth": {
+        "ibdcentre98a4cd1a": {}
+      }
+    }
+  },
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ibdcentre-dev-141302-authRole",
+      "UnauthRoleArn": "arn:aws:iam::252341934707:role/amplify-ibdcentre-dev-141302-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::252341934707:role/amplify-ibdcentre-dev-141302-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-ibdcentre-dev-141302-deployment",
+      "UnauthRoleName": "amplify-ibdcentre-dev-141302-unauthRole",
+      "StackName": "amplify-ibdcentre-dev-141302",
+      "StackId": "arn:aws:cloudformation:ca-central-1:252341934707:stack/amplify-ibdcentre-dev-141302/750515f0-ac54-11eb-9888-0eab779fa6d6",
+      "AmplifyAppId": "d2w9zxx84mhoyf"
+    },
+    "categories": {
+      "auth": {
+        "ibdcentre98a4cd1a": {}
+      }
+    }
+  },
+  "devb": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ibd-centre-devb-130149-authRole",
+      "UnauthRoleArn": "arn:aws:iam::591356733838:role/amplify-ibd-centre-devb-130149-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::591356733838:role/amplify-ibd-centre-devb-130149-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-ibd-centre-devb-130149-deployment",
+      "UnauthRoleName": "amplify-ibd-centre-devb-130149-unauthRole",
+      "StackName": "amplify-ibd-centre-devb-130149",
+      "StackId": "arn:aws:cloudformation:ca-central-1:591356733838:stack/amplify-ibd-centre-devb-130149/b7afde10-c56f-11eb-9a9c-022dbaefeb1e",
+      "AmplifyAppId": "d1x4xqrvj6ig9w"
+    },
+    "categories": {
+      "auth": {
+        "ibdcentre98a4cd1a": {}
+      }
+    }
+  }
+}

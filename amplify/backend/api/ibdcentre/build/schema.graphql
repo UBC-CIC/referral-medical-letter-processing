@@ -138,7 +138,7 @@ input UpdateStatusInput {
 }
 
 input DeleteStatusInput {
-  id: ID
+  id: ID!
 }
 
 type Mutation {
