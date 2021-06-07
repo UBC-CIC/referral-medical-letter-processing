@@ -27,8 +27,7 @@ samconfig.toml
 .venv
 venv/
 env/
-backend/env/
 
 # Output files
-out.yaml
+
 notification.s3
