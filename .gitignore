@@ -19,9 +19,16 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 .DS_Store
+
+# Sam
 samconfig.toml
 
 # Environments
 .venv
 venv/
 env/
+backend/env/
+
+# Output files
+out.yaml
+notification.s3

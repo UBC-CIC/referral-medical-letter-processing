@@ -26,8 +26,8 @@ if [ -z "$DYNAMO_TABLE" ]; then
 fi
 echo "DynamoDb Table: ${DYNAMO_TABLE}"
 
-sam build && sam package --s3-bucket ${S3_BUCKET} --output-template-file out.yaml
-sam deploy -g --template-file out.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --stack-name ibd-lambda --parameter-overrides ParameterKey=s3Bucket,ParameterValue="${S3_BUCKET}" ParameterKey=DynamoDbTable,ParameterValue="${DYNAMO_TABLE}"
+sam build && sam package --s3-bucket ibdcentreb3cbdd9c0c2a495498c88bf5c73a4aeadev-dev --output-template-file out.yaml
+sam deploy -g --template-file out.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --stack-name ibd-lambda --parameter-overrides ParameterKey=s3Bucket,ParameterValue="ibdcentreb3cbdd9c0c2a495498c88bf5c73a4aeadev-dev" ParameterKey=DynamoDbTable,ParameterValue="Status-v3d55wrngzdshbvebskwkvhjhi-dev"
 
 sleep 5
 
@@ -35,4 +35,4 @@ LAMBDAARN=$(aws ssm get-parameter --name "/ibd/lambdaArn" --query Parameter.Valu
 echo "Lambda: ${LAMBDAARN}"
 
 sed "s|%LambdaArn%|$LAMBDAARN|g" notification.json > notification.s3
-aws s3api put-bucket-notification-configuration --bucket "${S3_BUCKET}" --notification-configuration file://notification.s3 --output text
+aws s3api put-bucket-notification-configuration --bucket "ibdcentreb3cbdd9c0c2a495498c88bf5c73a4aeadev-dev" --notification-configuration file://notification.s3 --output text
