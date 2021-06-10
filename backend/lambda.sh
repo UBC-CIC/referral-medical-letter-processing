@@ -40,4 +40,4 @@ rm -rf package/
 
 # Updating lambda function
 # Read More at: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
-aws lambda update-function-code --function-name PdfToJson --zip-file fileb://function.zip
+aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://function.zip

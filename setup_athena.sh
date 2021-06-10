@@ -7,7 +7,7 @@ if [ -z "$PROJECT_NAME" ]; then
 fi
 echo "Project Name: ${PROJECT_NAME}"
 
-S3_BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
+BUCKET=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=user:Application,Values="${PROJECT_NAME}" --resource-type-filters s3 --query 'ResourceTagMappingList[*].[ResourceARN]' --output text | grep -v deployment | awk -F':::' '{print $2}')
 if [ -z "$BUCKET" ]; then
     echo 'Unable to find S3 BUCKET'
     exit 1
