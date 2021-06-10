@@ -8,7 +8,7 @@ This prototype was created for IBD Centre's data processing and storage of a sum
 * **Data Processing** - Uses a Lambda function in the backend to execute Comprehend Medical API and Regex pattern to detect and categorize information 
  
 ## Architecture Diagram
-![alt text](../docs/images/IBD.png)
+![alt text](docs/images/IBD.png)
 
 ## Requirements
 Before you deploy, you must have the following installed:
