@@ -20,11 +20,14 @@ Before you deploy, you must have the following installed:
 
 ## Deployment
 The overall deployment of this prototype can be split in 3 parts.
-1. Follow the [Frontend Deployment Guide](docs/deployment_guide1.md) for delpoying the first part of this solution
 
-2. Deploying the backend application onto your AWS account requires to follow this [deployment guide](docs/deployment_guide2.md)
+1. **Clone** and **Fork** this solution repository.
+2. Follow the [Deployment Guide](docs/deployment_guide1.md) to set up the frontend of this application.
 
-3. Cloudformation deployment works after you run the lambda script locally first (successfully completing the previous two steps). The following deployment [guide](docs/deployment_guide3.md) shows how to deploy using cloudformation and Amplify's one touch deployment.
+3. Next, you can follow this [Deployment Guide](docs/deployment_guide2.md) showing steps to deploy the backend lambda, add trigger, set up Athena, and how to check Cloudwatch logs
+
+## Cloudformation 
+1. Cloudformation deployment works once you run the lambda script locally (successfully completing the previous two steps). This [guide](docs/deployment_guide3.md) shows how to deploy using cloudformation and Amplify's one touch deployment.
 
 ## Change logs
 
