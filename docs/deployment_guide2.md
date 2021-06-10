@@ -5,7 +5,9 @@
 create_lambda.sh | create_lambda.bat
 ```
 a. The script asks for your AWS Account Id, Lambda name (PdfToJson), DynamoDB name (dynamodb-ibd), and region (ca-central-1)
+
 b. Deletes existing roles and attached policies (if any)
+
 c. Creates them again and packages and zips the first version of lambda script.
 
 2. You can confirm whether the function is made by going to the AWS Console and searching for Lambda.
@@ -15,7 +17,7 @@ You may need to search it.
 ![alt text](../docs/images/lambda1.png)
 
 4. You can see it connect like this:
-![alt text](../docs/images/add1.png)
+![alt text](../docs/images/addt.png)
 ![alt text](../docs/images/trigger.png)
 
 Finally, you should see the same bucket with lambda trigger attached when going to File storage in Amplify project in your AWS console.
@@ -46,7 +48,7 @@ You can also modify it to search within a string like this:
 ## Cloudwatch logs
 Moreover you can see the files get processed in real time 
 1. Search Cloudwatch on your AWS Console and click on the PdfToJson lambda
-![alt text](../docs/images/logs.ping)
+![alt text](../docs/images/logs.png)
 2. Next, you can select for the latest log file
 ![alt text](../docs/images/logs1.png)
 3. You can now see the log events (calls made by the lambda script) on your console for debugging 
