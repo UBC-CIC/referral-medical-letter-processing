@@ -19,15 +19,12 @@ Before you deploy, you must have the following installed:
 *  [Amplify CLI installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart) 
 
 ## Deployment
-The overall deployment has 3 parts.
-1. Frondend Deployment
-Follow this [guide](https://github.com/UBC-CIC/ibd-centre/docs/deployment_guide1.md) for delpoying the frontend of this solution
+The overall deployment of this prototype can be split in 3 parts.
+1. Follow the [Frontend Deployment Guide](docs/deployment_guide1.md) for delpoying the first part of this solution
 
-2. Backend Deployment and Athena set up
-Deploying the backend application onto your AWS account requires the following this [guide](https://github.com/UBC-CIC/ibd-centre/docs/deployment_guide2.md)
+2. Deploying the backend application onto your AWS account requires to follow this [deployment guide](docs/deployment_guide2.md)
 
-3. Cloudformation deployment
-This part works only if you run the lambda script locally first (successfully completing the previous two guides). The following deployment [guide](https://github.com/UBC-CIC/ibd-centre/docs/deployment_guide3.md) uses clloudformation and Amplify's one touch deployment.
+3. Cloudformation deployment works after you run the lambda script locally first (successfully completing the previous two steps). The following deployment [guide](docs/deployment_guide3.md) shows how to deploy using cloudformation and Amplify's one touch deployment.
 
 ## Change logs
 
