@@ -78,7 +78,7 @@ Successfully created/updated stack - ibd-lambda in ca-central-1
 
 Go back to your AWS console in Amplify, once frontend deployment is successful, you can now login, make an account and upload/process patient letters.
 
-### Athen set up
+### Athena set up
 1. Run `setup_athena.sh` or `setup_athena.bat` script, it will ask you for bucket name again and you can paste the same one. 
 2. Go to your aws account management console, search for Athena to find the newly made tables.
 
