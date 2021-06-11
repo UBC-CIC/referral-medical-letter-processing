@@ -27,6 +27,9 @@ Finally, you should see the same bucket with lambda trigger attached when going 
 lambda.sh | lambda.bat
 ```
 
+This is the flow diagram for how the index.py works:
+![alt text](../docs/images/ibd-flow-diagram.png)
+
 This concludes building the main stack of the project. Once you follow the steps outlined and wait for the Amplify project to finish building, you can now create users, upload a file, and process them using the URL. Once you're finished with a set of files, you can proceed to next steps for queries
 
 ## To set up the AWS Analytics tools

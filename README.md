@@ -85,7 +85,7 @@ Go back to your AWS console in Amplify, once frontend deployment is successful, 
 ### Manual Deployment
 1. If the one touch deployment doesn't work, you can follow this [Deployment Guide](docs/deployment_guide1.md) to set up the frontend of this application.
 
-2. Next, you can follow [this](docs/deployment_guide2.md) (more extensive guide) showing steps to deploy the backend lambda, add trigger, set up Athena, and how to check Cloudwatch logs
+2. You can follow [this](docs/deployment_guide2.md) (more extensive guide) showing how index.py works, steps to deploy the backend lambda, add trigger, set up Athena, and how to check Cloudwatch logs
 
 ## Change logs
 
