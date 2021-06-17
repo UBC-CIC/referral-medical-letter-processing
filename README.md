@@ -1,5 +1,5 @@
-# IBD Centre
-This prototype was created for IBD Centre's data processing and storage of a summary of patients
+# Medical Letter Processing
+This prototype was created for Specialist medical centres for data processing and storage for summary of patients
 
 ## Stack
 * **Front-end** - ReactJS on NodeJS as the core framework, Amplify for Auth UI component and AWS integration.
