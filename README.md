@@ -82,6 +82,10 @@ Go back to your AWS console in Amplify, once frontend deployment is successful, 
 1. Run `setup_athena.sh` or `setup_athena.bat` script, it will ask you for bucket name again and you can paste the same one. 
 2. Go to your aws account management console, search for Athena to find the newly made tables.
 
+### Backend logic
+Here is a flow diagram on how the index.py works:
+![alt text](docs/images/ibd-flow-diagram.png)
+
 ### Manual Deployment
 1. If the one touch deployment doesn't work, you can follow this [Deployment Guide](docs/deployment_guide1.md) to set up the frontend of this application.
 
