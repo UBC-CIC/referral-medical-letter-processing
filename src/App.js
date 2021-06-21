@@ -63,7 +63,7 @@ class App extends Component {
         {
             this.props.loginState !== "signedIn" && (
                 <div  className="App" style={{height: "100vh", width: "100vw"}}>
-                    <Login animateTitle={false} type={"image"} title={"IBD Centre"} darkMode={false} />
+                    <Login animateTitle={false} type={"image"} title={"Specialist Medical Centre"} darkMode={false} />
                 </div>
             )
         }

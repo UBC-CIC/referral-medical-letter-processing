@@ -162,10 +162,10 @@ def is_date(string, fuzzy=False):
 # Added code for summary response
 def process_file(text, ID, datedSentences):
 
-    # Comprehend Medical and Comprehend functions and setup
+    # Dictionary to store patient summary
     mySum = {}
 
-    # AWS Comprehend Medical
+    # Comprehend Medical and Comprehend functions and setup
     entity_text = findEntities(text)
     rxnorm_text = findRx(text)
     
@@ -235,8 +235,6 @@ def process_file(text, ID, datedSentences):
     mySum["detectedProcedures"] = procedures
     mySum["datedSentences"] = datedSentences
     
-    #mySum1 = json.loads(mySum)
-    #formattedSum = json.dumps(mySum1, indent=2)
     return json.dumps(mySum)
 
 def handler(event, context):
