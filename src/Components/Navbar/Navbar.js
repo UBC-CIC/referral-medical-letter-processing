@@ -42,7 +42,7 @@ function Navbar(props) {
                                         <Grid.Row>
                                             <Grid.Column width={7} textAlign={"center"} verticalAlign={"middle"}>
                                                 <div className={"brand-wrapper"}>
-                                                    <span className={"brand-text"}>IBD<span className={"brand-text-divider"}>/</span>Centre</span>
+                                                    <span className={"brand-text"}>Medical Specialist Centre</span>
                                                 </div>
                                             </Grid.Column>
                                             <Grid.Column width={9} textAlign={"center"} verticalAlign={"middle"}>
